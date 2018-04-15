@@ -1,38 +1,25 @@
-import nltk
 import pickle
+import time
 
-from Corpus import Corpus
-from pprint import pprint
+from corpus.Corpus import Corpus
+from trainers.RecursiveRegressionClassifier import RecursiveRegressionClassifier
 
-Body = Corpus()
+Loader = Corpus()
+start = time.time()
 
-def test(classifier, test_set):
-    incorrect = 0
+Classifier = RecursiveRegressionClassifier({
+    "base_data": [],
+    "block_size": 20,
+    "feature_data": Loader.get(20, "sentiment140"),
+    "test_data": Loader.get(20, "reviews") + Loader.get(20, "tweets"),
+    "thread_count": 1
+})
 
-    for test in test_set:
-        outcome = classifier.classify(test[0])
-        if (outcome != test[1]):
-            incorrect += 1
+result = Classifier.train()
+end = time.time()
 
-    accuracy = 1 - (float(incorrect) / len(test_set))
-    print(accuracy * 100)
-
-
-train_set = Body.get(1600000, "sentiment140")
-test_set1 = Body.get(3000, "reviews")
-# test_set2 = [train_set[500:], train_set[:500]]
-
-classifier = nltk.NaiveBayesClassifier.train(train_set)
-
-dump = open('sentiment.pickle', 'wb')
-pickle.dump(classifier, dump)
-dump.close()
-
-test(classifier, test_set1)
-# test(classifier, test_set2)
-
-# features = Body.get_features("it was a really good film")
-# dists = classifier.prob_classify(features)
-
-# print(dists.prob("positive"))
-# print(dists.prob('negative'))
+print (end - start)
+if (result["classifier"] != None):
+    output = open('trainers/trained/recursive-regression-classifier-threaded.pickle', 'wb')
+    pickle.dump(result["classifier"], output)
+    output.close()
