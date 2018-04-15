@@ -1,0 +1,6 @@
+{
+    "not": "f_has_negative",
+    "but": "f_has_mixed",
+    "although": "f_has_considered",
+    "even though": "f_has_considered"
+}

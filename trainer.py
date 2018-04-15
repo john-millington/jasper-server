@@ -9,9 +9,9 @@ start = time.time()
 
 Classifier = RecursiveRegressionClassifier({
     "base_data": [],
-    "block_size": 20,
-    "feature_data": Loader.get(20, "sentiment140"),
-    "test_data": Loader.get(20, "reviews") + Loader.get(20, "tweets"),
+    "block_size": 100,
+    "feature_data": Loader.get(10000, "sentiment140"),
+    "test_data": Loader.get(500, "reviews") + Loader.get(100, "tweets"),
     "thread_count": 1
 })
 

@@ -1,7 +1,11 @@
+import json
+
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import PorterStemmer
 
 from corpus.Contractions import Contractions
+
+cFeatures = json.load(open('./corpus/data/features.json'))
 
 class Features:
     def __init__(self):
@@ -15,6 +19,10 @@ class Features:
         features = {}
         for token in tokens:
             stemmed = self.stemmer.stem(token)
-            features[stemmed] = stemmed
+            features[f"w_{stemmed}"] = stemmed
+
+        for feature in cFeatures:
+            if feature in expanded:
+                features[cFeatures[feature]] = True
 
         return features

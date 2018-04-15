@@ -1,7 +1,7 @@
 import json
 import re
 
-cList = json.load(open('./Corpus/data/contractions.json'))
+cList = json.load(open('./corpus/data/contractions.json'))
 
 class Contractions:
     REGEX = re.compile('(%s)' % '|'.join(cList.keys()))

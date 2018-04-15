@@ -4,3 +4,4 @@ raw/sentiment140.csv
 
 *.pickle
 *.pyc
+*.DS_Store

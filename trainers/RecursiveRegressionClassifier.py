@@ -52,6 +52,7 @@ class RecursiveRegressionClassifier:
 
         if (best["score"] > self.best["score"]):
             self.best = best
+            self.base_data = best['set']
             return self.train()
 
         return self.best
