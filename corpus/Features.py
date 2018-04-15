@@ -21,8 +21,8 @@ class Features:
             stemmed = self.stemmer.stem(token)
             features[f"w_{stemmed}"] = stemmed
 
-        for feature in cFeatures:
-            if feature in expanded:
-                features[cFeatures[feature]] = True
+        # for feature in cFeatures:
+        #     if feature in expanded:
+        #         features[cFeatures[feature]] = True
 
         return features
