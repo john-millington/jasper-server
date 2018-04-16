@@ -1,12 +1,12 @@
 import nltk
 import pickle
+import argparse
+import time
 
 from corpus.Corpus import Corpus
-from pprint import pprint
-
-Body = Corpus()
 
 def test(classifier, test_set):
+    start_time = time.clock()
     incorrect = 0
 
     for test in test_set:
@@ -15,24 +15,27 @@ def test(classifier, test_set):
             incorrect += 1
 
     accuracy = 1 - (float(incorrect) / len(test_set))
-    print(accuracy * 100)
+    time_taken = time.clock() - start_time
+    ops_per_second = round(1 / (time_taken / len(test_set)))
+
+    print(f"Accuracy: {accuracy * 100}%")
+    print(f"Time: {time_taken}")
+    print(f"Operations Run: {len(test_set)}")
+    print(f"Operations/s: {ops_per_second}")
 
 
-train_set = Body.get(1600000, "sentiment140")
-test_set1 = Body.get(3000, "reviews")
-# test_set2 = [train_set[500:], train_set[:500]]
+parser = argparse.ArgumentParser()
+parser.add_argument('-c', '--classifier', help='Path to the pickled classifier object')
+parser.add_argument('-l', '--library', help='Name of library to test against', default='reviews')
+parser.add_argument('-s', '--size', help='Number of tests to run', default=3000, type=int)
 
-classifier = nltk.NaiveBayesClassifier.train(train_set)
+args = parser.parse_args()
+if args.classifier != None:
+  file = open(args.classifier, 'rb')
+  classifier = pickle.load(file)
+  file.close()
 
-dump = open('sentiment.pickle', 'wb')
-pickle.dump(classifier, dump)
-dump.close()
+  Loader = Corpus()
+  test_set = Loader.get(args.size, args.library) * 10
 
-test(classifier, test_set1)
-# test(classifier, test_set2)
-
-# features = Body.get_features("it was a really good film")
-# dists = classifier.prob_classify(features)
-
-# print(dists.prob("positive"))
-# print(dists.prob('negative'))
+  test(classifier, test_set)
