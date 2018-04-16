@@ -29,7 +29,8 @@ if args.name != None:
   result = Classifier.train()
   end = time.time()
 
-  print (end - start)
+  print(end - start)
+  print(f"Total Documents: {len(results['set'])}")
   if (result["classifier"] != None):
       output = open(f'trainers/trained/{args.name}.pickle', 'wb')
       pickle.dump(result["classifier"], output)
