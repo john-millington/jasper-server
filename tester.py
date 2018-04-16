@@ -31,11 +31,11 @@ parser.add_argument('-s', '--size', help='Number of tests to run', default=3000,
 
 args = parser.parse_args()
 if args.classifier != None:
-  file = open(args.classifier, 'rb')
-  classifier = pickle.load(file)
-  file.close()
+    file = open(args.classifier, 'rb')
+    classifier = pickle.load(file)
+    file.close()
 
-  Loader = Corpus()
-  test_set = Loader.get(args.size, args.library) * 10
+    Loader = Corpus()
+    test_set = Loader.get(args.size, args.library) * 10
 
-  test(classifier, test_set)
+    test(classifier, test_set)

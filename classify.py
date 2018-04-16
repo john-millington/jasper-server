@@ -10,21 +10,21 @@ parser.add_argument('--text', help='Text to classify')
 
 args = parser.parse_args()
 if args.classifier != None and args.text != None:
-  file = open(args.classifier, 'rb')
-  classifier = pickle.load(file)
-  file.close()
+    file = open(args.classifier, 'rb')
+    classifier = pickle.load(file)
+    file.close()
 
-  CorpusFeatures = Features()
-  ComputedClassifier = Classifier(args.classifier)
+    CorpusFeatures = Features()
+    ComputedClassifier = Classifier(args.classifier)
 
-  text = args.text
-  features = CorpusFeatures.get(text)
+    text = args.text
+    features = CorpusFeatures.get(text)
 
-  classification = classifier.classify(features)
-  print(classification)
+    classification = classifier.classify(features)
+    print(classification)
 
-  probabilities = classifier.prob_classify(features)
-  print(f"Positive: {probabilities.prob('positive')}")
-  print(f"Negative: {probabilities.prob('negative')}")
+    probabilities = classifier.prob_classify(features)
+    print(f"Positive: {probabilities.prob('positive')}")
+    print(f"Negative: {probabilities.prob('negative')}")
 
-  print(ComputedClassifier.classify(text))
+    print(ComputedClassifier.classify(text))
