@@ -21,8 +21,8 @@ class Features:
         self.stopwords = StopWords.words('english')
 
     def get(self, sentence):
-        # detweeted = re.sub(self.TWITTER_REGEX, '', sentence)
-        detweeted = sentence
+        detweeted = re.sub(self.TWITTER_REGEX, '', sentence)
+        # detweeted = sentence
         expanded = Contractions.expand(detweeted.lower())
         tokens = self.tokenizer.tokenize(expanded)
         

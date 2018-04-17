@@ -33,7 +33,6 @@ class RegressionClassifier:
             clone = best_set[:]
             del clone[i]
 
-
             os.system('clear')
             print("Regression Iteration: {}".format(iteration + i))
             print("Best Score: {}".format(best_score))

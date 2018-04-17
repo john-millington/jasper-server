@@ -26,5 +26,6 @@ if args.classifier != None and args.text != None:
     probabilities = classifier.prob_classify(features)
     print(f"Positive: {probabilities.prob('positive')}")
     print(f"Negative: {probabilities.prob('negative')}")
+    print(f"Neutral: {probabilities.prob('neutral')}")
 
     print(ComputedClassifier.classify(text))

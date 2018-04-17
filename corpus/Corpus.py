@@ -10,12 +10,13 @@ class Corpus:
         self.features = Features()
 
     def get(self, size, resource, mutate = False):
-        positives = self.sample(int(round(float(size / 2))), "positive", resource, mutate)
-        negatives = self.sample(int(round(float(size / 2))), "negative", resource, mutate)
-
+        info = json.load(open('./corpus/data/{}/info.json'.format(resource)))
+        division = len(info["chunks"].keys())
+        
         combined = []
-        combined.extend(positives)
-        combined.extend(negatives)
+        for resource_type in info["chunks"]:
+            resources = self.sample(int(round(float(size / division))), resource_type, resource, mutate)
+            combined.extend(resources)
 
         random.shuffle(combined)
 
