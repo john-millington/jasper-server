@@ -1,7 +1,9 @@
 import pickle
 import time
+import datetime
 import argparse
 import random
+import json
 
 from corpus.Corpus import Corpus
 from trainers.RecursiveRegressionClassifier import RecursiveRegressionClassifier
@@ -47,8 +49,29 @@ if args.name != None:
     end = time.time()
 
     print(end - start)
-    #   print(f"Total Documents: {len(results['set'])}")
     if (result["classifier"] != None):
         output = open(f'trainers/trained/{args.name}.pickle', 'wb')
         pickle.dump(result["classifier"], output)
         output.close()
+
+        outcomes = {}
+        for item in result['set']:
+            if item[1] not in outcomes:
+                outcomes[item[1]] = 0
+
+            outcomes[item[1]] += 1
+
+        with open(f'trainers/trained/{args.name}.json', 'w') as jsonout:
+            json.dump({
+                'libraries': libraries,
+                'tested': testlibraries,
+                'score': result['score'],
+                'classifier': f'{args.name}.pickle',
+                'time': str(datetime.timedelta(seconds=end - start)),
+                'statistics': {
+                    'passes': result['iterations'],
+                    'document_count': len(result['set']),
+                    'document_statistics': outcomes,
+                    'documents': result['set']
+                }
+            }, jsonout, indent=4, sort_keys=True)

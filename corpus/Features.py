@@ -13,6 +13,7 @@ cFeatures = json.load(open('./corpus/data/features.json'))
 class Features:
     # Removes twitter mentions and the preceeding hash from hash tags
     TWITTER_REGEX = re.compile(r"(@[^\s]+\s+)|(#(?=[^\s]+))")
+    URLS_REGEX = re.compile(r"(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?\s?")
 
     def __init__(self):
         # self.stemmer = PorterStemmer()
@@ -21,16 +22,16 @@ class Features:
         self.stopwords = StopWords.words('english')
 
     def get(self, sentence):
-        detweeted = re.sub(self.TWITTER_REGEX, '', sentence)
-        # detweeted = sentence
-        expanded = Contractions.expand(detweeted.lower())
+        modified = re.sub(self.TWITTER_REGEX, '', sentence)
+        modified = re.sub(self.URLS_REGEX, '', modified)
+        expanded = Contractions.expand(modified.lower())
         tokens = self.tokenizer.tokenize(expanded)
         
         features = {}
         for token in tokens:
             if token not in self.stopwords:
                 stemmed = self.stemmer.stem(token)
-                features[f"w_{stemmed}"] = stemmed
+                features[f"w_{stemmed}"] = 1
 
         # for feature in cFeatures:
         #     if feature in expanded:

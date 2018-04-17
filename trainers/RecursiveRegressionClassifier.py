@@ -55,4 +55,5 @@ class RecursiveRegressionClassifier:
             self.base_data = best['set']
             return self.train()
 
+        self.best['iterations'] = self.iterations
         return self.best
