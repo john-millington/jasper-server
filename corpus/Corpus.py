@@ -34,4 +34,4 @@ class Corpus:
                 if 'value' in line and 'sentiment' in line:
                     resources.append([self.features.get(line["value"]), line["sentiment"]])
 
-        return resources[1:size]
+        return resources[0:size]

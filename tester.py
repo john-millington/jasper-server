@@ -36,6 +36,6 @@ if args.classifier != None:
     file.close()
 
     Loader = Corpus()
-    test_set = Loader.get(args.size, args.library) * 10
+    test_set = Loader.get(args.size, args.library)
 
     test(classifier, test_set)
