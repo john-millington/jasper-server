@@ -1,6 +1,7 @@
 data/*/chunks/*
 data/*/info.json
 raw/sentiment140.csv
+trainers/trained/*.*
 
 *.pickle
 *.pyc
