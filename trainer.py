@@ -66,6 +66,7 @@ if args.name != None:
                 'libraries': libraries,
                 'tested': testlibraries,
                 'score': result['score'],
+                'delta': result['delta'],
                 'classifier': f'{args.name}.pickle',
                 'time': str(datetime.timedelta(seconds=end - start)),
                 'statistics': {
