@@ -8,6 +8,7 @@ class RegressionType(Enum):
     ABSOLUTE = 1
     EQUIVALENT = 2
     DELTA_RANGE = 3
+    EITHER = 4
 
 class RegressionClassifier:
     def __init__(self, config):
@@ -17,7 +18,7 @@ class RegressionClassifier:
         self.feature_data = config["feature_data"]
         self.test_data = config["test_data"]
         
-        self.regression_type = RegressionType.DELTA_RANGE
+        self.regression_type = RegressionType.ABSOLUTE
         if 'regression_type' in config:
             self.regression_type = config['regression_type']
         
@@ -25,11 +26,13 @@ class RegressionClassifier:
 
     def condition(self, previous_score, new_score):
         if self.regression_type is RegressionType.ABSOLUTE:
-            return previous_score['score'] < new_score['score'] and previous_score['delta'] > new_score['delta']
+            return previous_score['score'] < new_score['score'] and previous_score['delta'] >= new_score['delta']
         elif self.regression_type is RegressionType.EQUIVALENT:
             return previous_score['score'] + previous_score['delta'] > new_score['score'] + new_score['delta']
-        else:
+        elif self.regression_type is RegressionType.DELTA_RANGE:
             return previous_score['score'] < new_score['score'] and (new_score['delta'] - previous_score['delta'] < 0.05)
+        else:
+            return previous_score['score'] < new_score['score'] or previous_score['delta'] > new_score['delta']
         
 
     def chunks(self):
