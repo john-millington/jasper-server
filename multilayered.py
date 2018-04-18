@@ -6,6 +6,7 @@ import random
 import json
 
 from corpus.Corpus import Corpus
+from corpus.Features import Features
 from trainers.MultilayeredRecursiveRegression import MultilayeredRecursiveRegression
 from trainers.RecursiveRegressionClassifier import RecursiveRegressionClassifier
 
@@ -18,6 +19,7 @@ parser.add_argument('-t', '--threads', help='Number of threads to run the traini
 parser.add_argument('-f', '--testlibrary', help='The library to test against', default='reviews,tweets')
 parser.add_argument('-c', '--testcount', help='The size of the test library', default=3000, type=int)
 parser.add_argument('-m', '--mutate', help='Mutate the sentiment based on the score attribute', default=False, type=bool)
+parser.add_argument('-a', '--text', help='Mutate the sentiment based on the score attribute')
 
 args = parser.parse_args()
 
@@ -38,7 +40,7 @@ if args.name != None:
 
     random.shuffle(feature_data)
 
-    Classifier = RecursiveRegressionClassifier({
+    Classifier = MultilayeredRecursiveRegression({
         "base_data": [],
         "block_size": args.block,
         "feature_data": feature_data,
@@ -49,31 +51,29 @@ if args.name != None:
     result = Classifier.train()
     end = time.time()
 
-    print(end - start)
     if (result["classifier"] != None):
+        if args.text != None:
+            CorpusFeatures = Features()
+            Classifier.classify(CorpusFeatures.get(args.text))
+
         output = open(f'trainers/trained/{args.name}.pickle', 'wb')
         pickle.dump(result["classifier"], output)
         output.close()
 
-        outcomes = {}
-        for item in result['set']:
-            if item[1] not in outcomes:
-                outcomes[item[1]] = 0
+        # outcomes = {}
+        # for item in result['set']:
+        #     if item[1] not in outcomes:
+        #         outcomes[item[1]] = 0
 
-            outcomes[item[1]] += 1
+        #     outcomes[item[1]] += 1
 
         with open(f'trainers/trained/{args.name}.json', 'w') as jsonout:
             json.dump({
                 'libraries': libraries,
                 'tested': testlibraries,
-                'score': result['score'],
-                'delta': result['delta'],
+                'positive': result['positive'],
+                'negative': result['negative'],
+                'neutral': result['neutral'],
                 'classifier': f'{args.name}.pickle',
-                'time': str(datetime.timedelta(seconds=end - start)),
-                'statistics': {
-                    'passes': result['iterations'],
-                    'document_count': len(result['set']),
-                    'document_statistics': outcomes,
-                    'documents': result['set']
-                }
+                'time': str(datetime.timedelta(seconds=end - start))
             }, jsonout, indent=4, sort_keys=True)

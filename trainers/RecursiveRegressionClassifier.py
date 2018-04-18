@@ -25,10 +25,8 @@ class RecursiveRegressionClassifier:
 
     def thread(self, feature_data):
         classifier = RegressionClassifier({
-            "base_data": self.base_data,
-            "block_size": self.block_size,
-            "feature_data": feature_data,
-            "test_data": self.test_data
+            **self.config,
+            "feature_data": feature_data
         })
 
         return classifier.train()

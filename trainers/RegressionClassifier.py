@@ -2,13 +2,7 @@ import math
 import nltk
 import os
 
-from enum import Enum
-
-class RegressionType(Enum):
-    ABSOLUTE = 1
-    EQUIVALENT = 2
-    DELTA_RANGE = 3
-    EITHER = 4
+from trainers.RegressionType import RegressionType
 
 class RegressionClassifier:
     def __init__(self, config):
@@ -18,14 +12,22 @@ class RegressionClassifier:
         self.feature_data = config["feature_data"]
         self.test_data = config["test_data"]
         
-        self.regression_type = RegressionType.ABSOLUTE
+        self.name = 'Untitled'
+        if 'name' in config:
+            self.name = config['name']
+        
+        self.regression_type = RegressionType.SCORE
         if 'regression_type' in config:
             self.regression_type = config['regression_type']
         
         self.iteration_score = 0
 
     def condition(self, previous_score, new_score):
-        if self.regression_type is RegressionType.ABSOLUTE:
+        if self.regression_type is RegressionType.SCORE:
+            return previous_score['score'] < new_score['score']
+        elif self.regression_type is RegressionType.DELTA:
+            return previous_score['delta'] > new_score['delta']
+        elif self.regression_type is RegressionType.ABSOLUTE:
             return previous_score['score'] < new_score['score'] and previous_score['delta'] >= new_score['delta']
         elif self.regression_type is RegressionType.EQUIVALENT:
             return previous_score['score'] + previous_score['delta'] > new_score['score'] + new_score['delta']
@@ -78,6 +80,7 @@ class RegressionClassifier:
             del clone[i]
 
             os.system('clear')
+            print(f'Title: {self.name}')
             print("Regression Iteration: {}".format(iteration + i))
             print("Best Score: {}".format(best_score))
 
@@ -115,6 +118,7 @@ class RegressionClassifier:
                 best_set = base_clone
 
             os.system('clear')
+            print(f'Title: {self.name}')
             print("Iteration: {}".format(i))
             print("Best Score: {}".format(best_score))
 
