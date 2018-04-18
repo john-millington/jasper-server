@@ -15,8 +15,9 @@ Sentiment Polarities Dataset: https://www.kaggle.com/sonaam1234/sentimentdata
 With Neutral labels
 --------------------------------------------------------------------------------------------------------------
 
-Twitter (with neutral labels): https://www.kaggle.com/rabinandan/twitter-sentiment
-Airline Sentiment (with neutral labels): https://www.kaggle.com/chrisbellec/airlines-tweets-sentiments
+Twitter: https://www.kaggle.com/rabinandan/twitter-sentiment
+Airline Sentiment: https://www.kaggle.com/chrisbellec/airlines-tweets-sentiments
+First GOP Debate: https://www.kaggle.com/crowdflower/first-gop-debate-twitter-sentiment/data
 
 
 
