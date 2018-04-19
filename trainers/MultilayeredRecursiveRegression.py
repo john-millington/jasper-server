@@ -21,9 +21,15 @@ class MultilayeredRecursiveRegression:
         for layer in sorted(self.classifiers):
             result = self.classifiers[layer].prob_classify(features)
 
+            untagged = result.prob('untagged_label')
+            for_layer = result.prob(layer)
+
+            polarity = for_layer - untagged
+
             inner_index = 0
             for value in results:
                 if inner_index == current_index:
+                    # results[inner_index] = max(0.01, result.prob(layer) + polarity)
                     results[inner_index] = (value + (result.prob(layer) * len(results)))
                 else:
                     results[inner_index] = (value + result.prob('untagged_label'))

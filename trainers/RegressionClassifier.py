@@ -32,7 +32,7 @@ class RegressionClassifier:
         elif self.regression_type is RegressionType.EQUIVALENT:
             return previous_score['score'] + previous_score['delta'] > new_score['score'] + new_score['delta']
         elif self.regression_type is RegressionType.DELTA_RANGE:
-            return previous_score['score'] < new_score['score'] and (new_score['delta'] - previous_score['delta'] < 0.05)
+            return previous_score['score'] < new_score['score'] and (new_score['delta'] - previous_score['delta'] < 0.03)
         else:
             return previous_score['score'] < new_score['score'] or previous_score['delta'] > new_score['delta']
         

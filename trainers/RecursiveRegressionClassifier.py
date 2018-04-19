@@ -1,5 +1,6 @@
 import math
 import os
+import random
 
 from console.Console import Console
 from multiprocessing import Pool
@@ -26,7 +27,8 @@ class RecursiveRegressionClassifier:
     def thread(self, feature_data):
         classifier = RegressionClassifier({
             **self.config,
-            "feature_data": feature_data
+            "feature_data": feature_data,
+            "base_data": self.base_data
         })
 
         return classifier.train()
@@ -51,6 +53,8 @@ class RecursiveRegressionClassifier:
         if (best["score"] > self.best["score"]):
             self.best = best
             self.base_data = best['set']
+            
+            random.shuffle(self.blocks)
             return self.train()
 
         self.best['iterations'] = self.iterations
