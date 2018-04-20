@@ -6,7 +6,6 @@ import random
 import json
 
 from corpus.Corpus import Corpus
-from corpus.Features import Features
 from trainers.MultilayeredRecursiveRegression import MultilayeredRecursiveRegression
 from trainers.RecursiveRegressionClassifier import RecursiveRegressionClassifier
 
@@ -18,8 +17,6 @@ parser.add_argument('-b', '--block', help='Size of block to add in each iteratio
 parser.add_argument('-t', '--threads', help='Number of threads to run the training algorithm in', default=1, type=int)
 parser.add_argument('-f', '--testlibrary', help='The library to test against', default='reviews,tweets')
 parser.add_argument('-c', '--testcount', help='The size of the test library', default=3000, type=int)
-parser.add_argument('-m', '--mutate', help='Mutate the sentiment based on the score attribute', default=False, type=bool)
-parser.add_argument('-a', '--text', help='Mutate the sentiment based on the score attribute')
 
 args = parser.parse_args()
 
@@ -32,11 +29,11 @@ if args.name != None:
 
     tests = []
     for library in testlibraries:
-        tests += Loader.get(args.testcount, library, args.mutate)
+        tests += Loader.get(args.testcount, library)
 
     feature_data = []
     for library in libraries:
-        feature_data += Loader.get(args.size, library, args.mutate)
+        feature_data += Loader.get(args.size, library)
 
     random.shuffle(feature_data)
 
@@ -52,10 +49,6 @@ if args.name != None:
     end = time.time()
 
     if (result["classifier"] != None):
-        if args.text != None:
-            CorpusFeatures = Features()
-            Classifier.classify(CorpusFeatures.get(args.text))
-
         output = open(f'trainers/trained/{args.name}.pickle', 'wb')
         pickle.dump(result["classifier"], output)
         output.close()

@@ -50,7 +50,10 @@ class MultilayeredRecursiveRegression:
         for (index, value) in enumerate(results):
             results[index] = (value / totals)
 
-        confidence = 1 - (untagged / totals)
+        copied_results = results[:]
+        max_result = max(copied_results)
+        copied_results.remove(max_result)
+        confidence = (max_result - max(copied_results))
 
         return ProbDist(dict(zip(keys, results)), confidence)
 

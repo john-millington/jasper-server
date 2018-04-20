@@ -9,7 +9,7 @@ import json
 from Classifier import Classifier
 
 hostName = ""
-hostPort = 80
+hostPort = 1000
 
 classifier = Classifier()
 
@@ -22,7 +22,8 @@ class MyServer(BaseHTTPRequestHandler):
         return {
             'text': text,
             'sentiment': result.max(),
-            'scores': result.dict
+            'scores': result.dict(),
+            'confidence': result.confidence()
         }
 
     def do_GET(self):

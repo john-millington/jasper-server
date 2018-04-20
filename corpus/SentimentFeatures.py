@@ -10,7 +10,7 @@ from corpus.Contractions import Contractions
 
 cFeatures = json.load(open('./corpus/data/features.json'))
 
-class Features:
+class SentimentFeatures:
     # Removes twitter mentions and the preceeding hash from hash tags
     TWITTER_REGEX = re.compile(r"(@[^\s]+\s+)|(#(?=[^\s]+))")
     URLS_REGEX = re.compile(r"(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?\s?")
