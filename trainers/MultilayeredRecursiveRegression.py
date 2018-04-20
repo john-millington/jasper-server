@@ -1,3 +1,4 @@
+import math
 import random
 
 from trainers.ProbDist import ProbDist
@@ -15,34 +16,43 @@ class MultilayeredRecursiveRegression:
         return self.prob_classify(features).max()
 
     def prob_classify(self, features):
-        results = [1] * len(sorted(self.classifiers.keys()))
+        keys = sorted(self.classifiers.keys())
+        results = [1] * len(keys)
 
-        current_index = 0
-        for layer in sorted(self.classifiers):
+        untagged = 0
+        mixed_prob = 0
+
+        for (key_index, layer) in enumerate(keys):
             result = self.classifiers[layer].prob_classify(features)
 
-            untagged = result.prob('untagged_label')
+            untagged = (untagged + result.prob('untagged_label')) / 2
             for_layer = result.prob(layer)
+            if (for_layer > 0.7):
+                mixed_prob = mixed_prob + (for_layer * len(results))
 
             polarity = for_layer - untagged
 
-            inner_index = 0
-            for value in results:
-                if inner_index == current_index:
+            for (result_index, value) in enumerate(results):
+                if result_index == key_index:
                     # results[inner_index] = max(0.01, result.prob(layer) + polarity)
-                    results[inner_index] = (value + (result.prob(layer) * len(results)))
+                    results[result_index] = (value + (result.prob(layer) * len(results)))
+                    # results[inner_index] = result.prob(layer)
                 else:
-                    results[inner_index] = (value + result.prob('untagged_label'))
+                    results[result_index] = (value + untagged)
 
-                inner_index += 1
-                    
-            current_index += 1
+        results.append(mixed_prob)
+        keys.append('mixed')
 
+        for (index, value) in enumerate(results):
+            results[index] = math.exp(value)
+            
         totals = sum(results)
-        for index, value in enumerate(results):
-            results[index] = (value / totals) * 1
+        for (index, value) in enumerate(results):
+            results[index] = (value / totals)
 
-        return ProbDist(dict(zip(sorted(self.classifiers.keys()), results)))
+        confidence = 1 - (untagged / totals)
+
+        return ProbDist(dict(zip(keys, results)), confidence)
 
     def get_layers(self, feature_set):
         separated = {}

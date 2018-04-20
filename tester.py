@@ -17,11 +17,14 @@ def test(classifier, test_set):
             classifications[test[1]] = 0
 
         if test[1] not in outcomes:
-            outcomes[test[1]] = 0
+            outcomes[test[1]] = {}
+
+        if outcome not in outcomes[test[1]]:
+            outcomes[test[1]][outcome] = 0
 
         classifications[test[1]] += 1
         if (outcome != test[1]):
-            outcomes[test[1]] += 1
+            outcomes[test[1]][outcome] += 1
             incorrect += 1
 
     accuracy = 1 - (float(incorrect) / len(test_set))
@@ -33,10 +36,11 @@ def test(classifier, test_set):
     print(f"Operations Run: {len(test_set)}")
     print(f"Operations/s: {ops_per_second}")
     print()
+    print(outcomes)
 
-    for classification in classifications:
-        cls_accuracy = 1 - (float(outcomes[classification]) / classifications[classification])
-        print(f"{classification} accuracy: {cls_accuracy}")
+    # for classification in classifications:
+    #     cls_accuracy = 1 - (float(outcomes[classification]) / classifications[classification])
+    #     print(f"{classification} accuracy: {cls_accuracy}")
 
 
 parser = argparse.ArgumentParser()

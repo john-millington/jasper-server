@@ -1,8 +1,12 @@
 import operator
 
 class ProbDist:
-    def __init__(self, dict):
+    def __init__(self, dict, confidence):
         self.dict = dict
+        self._confidence = confidence
+
+    def confidence(self):
+        return self._confidence
 
     def prob(self, sample):
         return self.dict.get(sample)
