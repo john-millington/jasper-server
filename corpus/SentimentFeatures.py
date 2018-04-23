@@ -24,6 +24,7 @@ class SentimentFeatures:
     def get(self, sentence):
         modified = re.sub(self.TWITTER_REGEX, '', sentence)
         modified = re.sub(self.URLS_REGEX, '', modified)
+        
         expanded = Contractions.expand(modified.lower())
         tokens = self.tokenizer.tokenize(expanded)
         
@@ -31,10 +32,15 @@ class SentimentFeatures:
         for token in tokens:
             if token not in self.stopwords:
                 stemmed = self.stemmer.stem(token)
-                features[f"w_{stemmed}"] = 1
+                if len(stemmed) > 1:
+                    word_tag = f'w_{stemmed}'
+                    if word_tag in features:
+                        word_tag = f'r_{stemmed}'
+
+                    features[word_tag] = 1
 
         # for feature in cFeatures:
         #     if feature in expanded:
-        #         features[cFeatures[feature]] = True
+        #         features[cFeatures[feature]] = 1
 
         return features

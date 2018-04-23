@@ -62,11 +62,9 @@ if args.name != None:
 
         with open(f'trainers/trained/{args.name}.json', 'w') as jsonout:
             json.dump({
+                **result,
                 'libraries': libraries,
                 'tested': testlibraries,
-                'positive': result['positive'],
-                'negative': result['negative'],
-                'neutral': result['neutral'],
                 'classifier': f'{args.name}.pickle',
                 'time': str(datetime.timedelta(seconds=end - start))
             }, jsonout, indent=4, sort_keys=True)

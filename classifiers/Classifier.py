@@ -1,42 +1,48 @@
-import pickle
-from corpus.Features import Features
+import math
+from trainers.ProbDist import ProbDist
 
 class Classifier:
-  NEUTRAL_THRESHOLD = 0.2
+  def __init__(self, classifiers): 
+    self.classifiers = classifiers
 
-  def __init__(self, classifier):
-    pre_pickled = open(classifier, 'rb')
-    self.classifier = pickle.load(pre_pickled)
-    pre_pickled.close()
+  def prob_classify(self, features):
+        keys = sorted(self.classifiers.keys())
+        results = [1] * len(keys)
 
-    self.features = Features()
+        untagged = 0
+        mixed_prob = 0
 
-  def classify(self, text):
-    features = self.features.get(text)
-    probabilities = self.classifier.prob_classify(features)
+        for (key_index, layer) in enumerate(keys):
+            result = self.classifiers[layer].prob_classify(features)
 
-    pos = probabilities.prob('positive')
-    neg = probabilities.prob('negative')
+            untagged = (untagged + result.prob('untagged_label')) / 2
+            for_layer = result.prob(layer)
+            if (for_layer > 0.7):
+                mixed_prob = mixed_prob + (for_layer * len(results))
 
-    neutral = 1 - abs(pos - neg)
-    total = pos + neg + neutral
+            polarity = for_layer - untagged
 
-    pos = pos / total
-    neg = neg / total
-    neutral = neutral / total
+            for (result_index, value) in enumerate(results):
+                if result_index == key_index:
+                    # results[inner_index] = max(0.01, result.prob(layer) + polarity)
+                    results[result_index] = (value + (result.prob(layer) * len(results)))
+                    # results[inner_index] = result.prob(layer)
+                else:
+                    results[result_index] = (value + untagged)
 
-    sentiment = 'positive'
-    if neg > pos and neg > neutral:
-      sentiment = 'negative'
-    elif neutral > pos and neutral > neg:
-      sentiment = 'neutral'
+        results.append(mixed_prob)
+        keys.append('mixed')
 
-    return {
-      "sentiment": sentiment,
-      "scores": {
-        "negative": neg,
-        "positive": pos,
-        "neutral": neutral
-      }
-    }    
+        for (index, value) in enumerate(results):
+            results[index] = math.exp(value)
+            
+        totals = sum(results)
+        for (index, value) in enumerate(results):
+            results[index] = (value / totals)
 
+        copied_results = results[:]
+        max_result = max(copied_results)
+        copied_results.remove(max_result)
+        confidence = (max_result - max(copied_results))
+
+        return ProbDist(dict(zip(keys, results)), confidence)

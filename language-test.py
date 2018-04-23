@@ -2,7 +2,6 @@ import pickle
 import argparse
 
 from corpus.LanguageDetectFeatures import LanguageDetectFeatures
-from classifiers.Classifier import Classifier
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--classifier', help='Path to the pickled classifier object')
@@ -14,11 +13,9 @@ if args.classifier != None and args.text != None:
     classifier = pickle.load(file)
     file.close()
 
-    CorpusFeatures = LanguageDetectFeatures()
-    ComputedClassifier = Classifier(args.classifier)
-
     text = args.text
-    features = CorpusFeatures.get(text)
+    FeatureDetection = LanguageDetectFeatures()
+    features = FeatureDetection.get(text)
 
     classification = classifier.classify(features)
     print(classification)
@@ -26,5 +23,3 @@ if args.classifier != None and args.text != None:
     probabilities = classifier.prob_classify(features)
     print(probabilities.dict())
     print(f"Confidence: {probabilities.confidence()}")
-
-    print(ComputedClassifier.classify(text))

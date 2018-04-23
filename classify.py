@@ -2,7 +2,6 @@ import pickle
 import argparse
 
 from corpus.SentimentFeatures import SentimentFeatures
-from classifiers.Classifier import Classifier
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--classifier', help='Path to the pickled classifier object')
@@ -15,7 +14,6 @@ if args.classifier != None and args.text != None:
     file.close()
 
     CorpusFeatures = SentimentFeatures()
-    ComputedClassifier = Classifier(args.classifier)
 
     text = args.text
     features = CorpusFeatures.get(text)
@@ -29,5 +27,3 @@ if args.classifier != None and args.text != None:
     print(f"Neutral: {probabilities.prob('neutral')}")
     print(f"Mixed: {probabilities.prob('mixed')}")
     print(f"Confidence: {probabilities.confidence()}")
-
-    print(ComputedClassifier.classify(text))

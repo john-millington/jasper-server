@@ -15,6 +15,9 @@ class MultilayeredRecursiveRegression:
     def classify(self, features):
         return self.prob_classify(features).max()
 
+    # TODO
+    # TODO - This algorithm needs work, total bollocks
+    # TODO
     def prob_classify(self, features):
         keys = sorted(self.classifiers.keys())
         results = [1] * len(keys)
@@ -56,6 +59,9 @@ class MultilayeredRecursiveRegression:
         confidence = (max_result - max(copied_results))
 
         return ProbDist(dict(zip(keys, results)), confidence)
+
+    def recast(self, type):
+        return type(self.classifiers)
 
     def get_layers(self, feature_set):
         separated = {}

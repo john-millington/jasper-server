@@ -17,7 +17,7 @@ parser.add_argument('-s', '--size', help='Size of sample to train against', defa
 parser.add_argument('-b', '--block', help='Size of block to add in each iteration', default=100, type=int)
 parser.add_argument('-t', '--threads', help='Number of threads to run the training algorithm in', default=1, type=int)
 parser.add_argument('-f', '--testlibrary', help='The library to test against', default='wiki-languages-train')
-parser.add_argument('-c', '--testcount', help='The size of the test library', default=3000, type=int)
+parser.add_argument('-c', '--testcount', help='The size of the test library', default=4000, type=int)
 
 args = parser.parse_args()
 
@@ -28,13 +28,34 @@ if args.name != None:
     libraries = args.library.split(',')
     testlibraries = args.testlibrary.split(',')
 
+    # languages = [
+    #     'en', 'vi', 'fr', 'ceb', 'sv', 
+    #     'es', 'de', 'ru', 'zh', 'it', 
+    #     'pt', 'sh', 'fa', 'sr', 'nl', 
+    #     'ar', 'ja', 'war', 'pl', 'uk', 
+    #     'id', 'ro', 'ko', 'tr', 'ca', 
+    #     'no', 'hu', 'fi', 'cs', 'he',
+    #     'ms', 'hy', 'da', 'hi', 'ur',
+    #     'eu', 'zh-min-nan', 'th', 'uz', 'bn',
+    #     'eo', 'bg', 'kk', 'be', 'sk',
+    #     'hr', 'el', 'lt', 'et', 'mk',
+    #     'sl', 'bs', 'gl', 'ml', 'az',
+    #     'ka', 'lv', 'ta', 'nn', 'min',
+    #     'la', 'vo', 'tl', 'te', 'mg',
+    #     'cy', 'mr', 'sq', 'new', 'ce',
+    #     'tt', 'sco', 'tg', 'zh-yue', 'arz',
+    #     'oc', 'azb', 'af', 'ckb', 'lb'
+    # ]
+
+    languages = ['en', 'zh']
+
     tests = []
     for library in testlibraries:
-        tests += Loader.get_subset(args.testcount, library, ['en', 'de', 'fr', 'es', 'it'])
+        tests += Loader.get_subset(args.testcount, library, languages)
 
     feature_data = []
     for library in libraries:
-        feature_data += Loader.get_subset(args.size * 5, library, ['en', 'de', 'fr', 'es', 'it'])
+        feature_data += Loader.get_subset(args.size * len(languages), library, languages)
 
     random.shuffle(feature_data)
 

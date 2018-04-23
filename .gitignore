@@ -4,6 +4,5 @@ raw/sentiment140.csv
 trainers/trained/*.*
 trainers/trained/archived/*
 
-*.pickle
 *.pyc
 *.DS_Store

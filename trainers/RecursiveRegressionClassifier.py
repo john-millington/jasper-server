@@ -2,7 +2,6 @@ import math
 import os
 import random
 
-from console.Console import Console
 from multiprocessing import Pool
 from trainers.RegressionClassifier import RegressionClassifier
 
