@@ -32,13 +32,13 @@ class SourceService(SearchService):
     def news(self, query):
         source = query['meta']['source_url']
         source_encode = urllib.parse.quote(source, safe='')
-        clean_text = requests.get(f'http://boilerpipe-web.appspot.com/extract?url={source_encode}&extractor=ArticleExtractor&output=json')
+        clean_text = requests.get('http://boilerpipe-web.appspot.com/extract?url={}&extractor=ArticleExtractor&output=json'.format(source_encode))
         json_dump = clean_text.json()
 
         text = json_dump['response']['content']
         text_split = text.split('\n')
         for (index, item) in enumerate(text_split):
-            text_split[index] = f'<p class="result-view__paragraph">{item}</p>'
+            text_split[index] = '<p class="result-view__paragraph">{}</p>'.format(item)
 
         formatted = ''.join(text_split)
 
@@ -58,7 +58,7 @@ class SourceService(SearchService):
         response = {
             'contents': [ ]
         }
-        
+
         reply = query['meta']['reply_to']
         if (reply != None):
             result = self.twitter_client.request('statuses/show/:%s' % reply, {

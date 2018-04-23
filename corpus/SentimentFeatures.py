@@ -33,9 +33,9 @@ class SentimentFeatures:
             if token not in self.stopwords:
                 stemmed = self.stemmer.stem(token)
                 if len(stemmed) > 1:
-                    word_tag = f'w_{stemmed}'
+                    word_tag = 'w_{}'.format(stemmed)
                     if word_tag in features:
-                        word_tag = f'r_{stemmed}'
+                        word_tag = 'r_{}'.format(stemmed)
 
                     features[word_tag] = 1
 

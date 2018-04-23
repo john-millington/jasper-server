@@ -80,7 +80,7 @@ class RegressionClassifier:
             del clone[i]
 
             os.system('clear')
-            print(f'Title: {self.name}')
+            print('Title: {}'.format(self.name))
             print("Regression Iteration: {}".format(iteration + i))
             print("Best Score: {}".format(best_score))
 
@@ -118,7 +118,7 @@ class RegressionClassifier:
                 best_set = base_clone
 
             os.system('clear')
-            print(f'Title: {self.name}')
+            print('Title: {}'.format(self.name))
             print("Iteration: {}".format(i))
             print("Best Score: {}".format(best_score))
 
