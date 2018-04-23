@@ -6,7 +6,7 @@ import time
 from server.JasperServer import JasperServer
 
 hostName = ''
-hostPort = 80
+hostPort = 1000
 
 myServer = HTTPServer((hostName, hostPort), JasperServer)
 print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))

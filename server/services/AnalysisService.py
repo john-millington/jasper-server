@@ -1,27 +1,17 @@
-from TwitterAPI import TwitterAPI
-from server.core.Classifier import Classifier
+import random
 
-class AnalysisService:
+from server.core.Classifier import Classifier
+from server.services.SearchService import SearchService
+
+class AnalysisService(SearchService):
     def __init__(self):
         self.classifier = Classifier()
+        super().__init__()
 
-        self.client = TwitterAPI(
-            os.environ.get('TWITTER_CONSUMER_KEY'),
-            os.environ.get('TWITTER_CONSUMER_SECRET'),
-            os.environ.get('TWITTER_ACCESS_TOKEN_KEY'),
-            os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
-        )
 
     def analyse(self, query):
-        count = 20
-        if ('count' in query):
-            count = query['count'][0]
-
-        results = self.client.request('search/tweets', { 
-            'q': query['q'][0] + ' -filter:retweets AND -filter:replies',
-            'tweet_mode': 'extended',
-            'count': count
-        })
+        results = self.tweets(query) + self.news(query)
+        random.shuffle(results)
 
         fields = []
         if ('fields' in query):
@@ -29,13 +19,37 @@ class AnalysisService:
 
         curated = []
         for result in results:
-            text = result['full_text']
-            curation = { 
-                'text': text
+            text = result['text']
+
+            sentiment = self.classifier.sentiment(text)
+            special = self.classifier.special(text)
+
+            sentiment_max = sentiment.max()
+            special_max = special.max()
+
+            if (sentiment_max == 'neutral'):
+                if (special_max not in ['sadness', 'surprise', 'fear', 'joy']):
+                    continue
+
+            if (sentiment_max == 'positive'):
+                if (special_max not in ['joy', 'love']):
+                    continue
+
+            if (sentiment_max == 'negative'):
+                if (special_max not in ['anger', 'sadness']):
+                    continue
+
+            meta = result['meta']
+
+            curation = {
+                **result,
+                'meta': {
+                    **meta
+                }
             }
 
             if ('sentiment' in fields):
-                sentiment = self.classifier.sentiment(text)
+                
                 curation['sentiment'] = {
                     'sentiment': sentiment.max(),
                     'scores': sentiment.dict(),
@@ -50,7 +64,6 @@ class AnalysisService:
                 }
 
             if ('special' in fields):
-                special = self.classifier.special(text)
                 curation['special'] = {
                     'sentiment': special.max(),
                     'scores': special.dict(),
@@ -64,7 +77,7 @@ class AnalysisService:
             curated.append(curation)
 
         return {
-            'tweets': curated
+            'results': curated
         }
 
     def handle(self, query):

@@ -7,6 +7,7 @@ from urllib.parse import parse_qs
 from server.services.ClassifyService import ClassifyService
 from server.services.SearchService import SearchService
 from server.services.AnalysisService import AnalysisService
+from server.services.SourceService import SourceService
 
 class JasperServer(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
@@ -14,7 +15,8 @@ class JasperServer(BaseHTTPRequestHandler):
     SERVICES = {
         '/api/analyse': AnalysisService(),
         '/api/classify': ClassifyService(),
-        '/api/search': SearchService()
+        '/api/search': SearchService(),
+        '/api/source': SourceService()
     }
 
     def do_GET(self):
