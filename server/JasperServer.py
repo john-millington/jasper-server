@@ -29,8 +29,8 @@ class JasperServer(BaseHTTPRequestHandler):
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
-        json_data = post_data.decode('utf8').replace("'", '"')
-        post_dict = json.loads(json_data)
+        # json_data = post_data.decode('utf8')
+        post_dict = json.loads(post_data)
 
         self.handle_service_request(post_dict)
 

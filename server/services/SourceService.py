@@ -1,8 +1,7 @@
-import html2text
 import requests
 import nltk
-
-from bs4 import BeautifulSoup, NavigableString, Tag
+import json
+import urllib.parse
 
 from server.core.Classifier import Classifier
 from server.services.SearchService import SearchService
@@ -10,11 +9,6 @@ from server.services.SearchService import SearchService
 class SourceService(SearchService):
     def __init__(self):
         # self.classifier = Classifier()
-
-        self.parser = html2text.HTML2Text()
-        self.parser.ignore_links = True
-        self.parser.ignore_images = True
-        self.parser.ignore_tables = True
 
         super().__init__()
 
@@ -37,12 +31,22 @@ class SourceService(SearchService):
     
     def news(self, query):
         source = query['meta']['source_url']
-        clean_text = requests.get(f'http://boilerpipe-web.appspot.com/extract?url={source}&extractor=ArticleExtractor&output=htmlFragment')
+        source_encode = urllib.parse.quote(source, safe='')
+        clean_text = requests.get(f'http://boilerpipe-web.appspot.com/extract?url={source_encode}&extractor=ArticleExtractor&output=json')
+        json_dump = clean_text.json()
+
+        text = json_dump['response']['content']
+        text_split = text.split('\n')
+        for (index, item) in enumerate(text_split):
+            text_split[index] = f'<p class="result-view__paragraph">{item}</p>'
+
+        formatted = ''.join(text_split)
 
         return {
             'contents': [ 
                 {
-                    'text': clean_text.text,
+                    'title': json_dump['response']['title'],
+                    'text': formatted,
                     'source': query['source'],
                     'meta': query['meta']
                 }
@@ -52,10 +56,9 @@ class SourceService(SearchService):
 
     def tweet(self, query):
         response = {
-            'contents': [
-                query
-            ]
+            'contents': [ ]
         }
+        
         reply = query['meta']['reply_to']
         if (reply != None):
             result = self.twitter_client.request('statuses/show/:%s' % reply, {
