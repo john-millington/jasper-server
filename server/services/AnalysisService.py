@@ -11,7 +11,8 @@ class AnalysisService(SearchService):
 
     def analyse(self, query):
         results = self.tweets(query) + self.news(query)
-        random.shuffle(results)
+        sorted(results, key=lambda result: result['meta']['timestamp'])
+        # random.shuffle(results)
 
         fields = []
         if ('fields' in query):

@@ -1,5 +1,7 @@
 import json
 
+from dateutil.parser import parse
+
 from newsapi import NewsApiClient
 from TwitterAPI import TwitterAPI
 
@@ -59,13 +61,20 @@ class SearchService:
 
         articles = []
         for article in response['articles']:
+            parsed = parse(article['publishedAt'])
+
+            formatted = parsed.isoformat()
+            timestamp = int(parsed.timestamp())
+
             articles.append({
                 'source': article['source']['name'],
                 'text': article['title'],
                 'meta': {
                     'type': 'search.news',
                     'source_url': article['url'],
-                    'image_url': article['urlToImage']
+                    'image_url': article['urlToImage'],
+                    'created_at': formatted,
+                    'timestamp': timestamp
                 }
             })
 
@@ -75,7 +84,9 @@ class SearchService:
                 'meta': {
                     'type': 'search.news',
                     'source_url': article['url'],
-                    'image_url': article['urlToImage']
+                    'image_url': article['urlToImage'],
+                    'created_at': formatted,
+                    'timestamp': timestamp
                 }
             })
 
@@ -97,13 +108,20 @@ class SearchService:
         })
 
         tweets = []
-        for result in results: 
+        for result in results:
+            parsed = parse(result['created_at'])
+
+            formatted = parsed.isoformat()
+            timestamp = int(parsed.timestamp())
+
             tweets.append({
                 'source': '@' + result['user']['screen_name'],
                 'text': result['full_text'],
                 'meta': {
                     'type': 'search.tweet',
-                    'reply_to': result['in_reply_to_status_id_str']
+                    'reply_to': result['in_reply_to_status_id_str'],
+                    'created': formatted,
+                    'timestamp': timestamp
                 }
             })
 

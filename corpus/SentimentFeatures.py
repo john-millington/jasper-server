@@ -22,25 +22,32 @@ class SentimentFeatures:
         self.stopwords = StopWords.words('english')
 
     def get(self, sentence):
-        modified = re.sub(self.TWITTER_REGEX, '', sentence)
-        modified = re.sub(self.URLS_REGEX, '', modified)
-        
-        expanded = Contractions.expand(modified.lower())
-        tokens = self.tokenizer.tokenize(expanded)
-        
         features = {}
-        for token in tokens:
-            if token not in self.stopwords:
-                stemmed = self.stemmer.stem(token)
-                if len(stemmed) > 1:
-                    word_tag = 'w_{}'.format(stemmed)
-                    if word_tag in features:
-                        word_tag = 'r_{}'.format(stemmed)
+        if sentence != None:
+            modified = sentence
 
-                    features[word_tag] = 1
+            try:
+                modified = re.sub(self.TWITTER_REGEX, '', sentence)
+                modified = re.sub(self.URLS_REGEX, '', modified)
+            except:
+                pass
+            
+            expanded = Contractions.expand(modified.lower())
+            tokens = self.tokenizer.tokenize(expanded)
+            
+            features = {}
+            for token in tokens:
+                if token not in self.stopwords:
+                    stemmed = self.stemmer.stem(token)
+                    if len(stemmed) > 1:
+                        word_tag = 'w_{}'.format(stemmed)
+                        if word_tag in features:
+                            word_tag = 'r_{}'.format(stemmed)
 
-        # for feature in cFeatures:
-        #     if feature in expanded:
-        #         features[cFeatures[feature]] = 1
+                        features[word_tag] = 1
+
+            # for feature in cFeatures:
+            #     if feature in expanded:
+            #         features[cFeatures[feature]] = 1
 
         return features
