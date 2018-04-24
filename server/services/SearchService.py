@@ -68,19 +68,7 @@ class SearchService:
 
             articles.append({
                 'source': article['source']['name'],
-                'text': article['title'],
-                'meta': {
-                    'type': 'search.news',
-                    'source_url': article['url'],
-                    'image_url': article['urlToImage'],
-                    'created_at': formatted,
-                    'timestamp': timestamp
-                }
-            })
-
-            articles.append({
-                'source': article['source']['name'],
-                'text': article['description'],
+                'text': article['title'] + ' ' + article['description'],
                 'meta': {
                     'type': 'search.news',
                     'source_url': article['url'],
