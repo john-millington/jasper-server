@@ -29,11 +29,11 @@ if args.name != None:
 
     tests = []
     for library in testlibraries:
-        tests += Loader.get(args.testcount, library)
+        tests += Loader.of_each(args.testcount, library)
 
     feature_data = []
     for library in libraries:
-        feature_data += Loader.get(args.size, library)
+        feature_data += Loader.of_each(args.size, library)
 
     random.shuffle(feature_data)
 

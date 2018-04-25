@@ -66,9 +66,16 @@ class SearchService:
             formatted = parsed.isoformat()
             timestamp = int(parsed.timestamp())
 
+            content = ''
+            if article['title'] != None:
+                content += article['title']
+
+            if article['description'] != None:
+                content += ' ' + article['description']
+
             articles.append({
                 'source': article['source']['name'],
-                'text': article['title'] + ' ' + article['description'],
+                'text': content,
                 'meta': {
                     'type': 'search.news',
                     'source_url': article['url'],
