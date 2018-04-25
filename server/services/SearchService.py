@@ -55,7 +55,7 @@ class SearchService:
             q=query['q'][0],
             sources=self.get_source_list(),
             language='en',
-            sort_by='relevancy',
+            sort_by='publishedAt',
             page_size=int(count)
         )
 
