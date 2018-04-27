@@ -4,8 +4,7 @@ from classifiers.Classifier import Classifier
 from trainers.ProbDist import ProbDist
 
 class SpecialClassifier(Classifier):
-    def __init__(self):
-        self.type = 'special'
+    TYPE = 'special'
 
     # def prob_classify(self, features):
     #     keys = sorted(self.classifiers.keys())

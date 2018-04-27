@@ -6,41 +6,54 @@ class ClassifyService:
         self.classifier = Classifier()
 
 
-    def classify(self, text):
-        sentiment = self.classifier.sentiment(text)
-        language = self.classifier.language(text)
-        special = self.classifier.special(text)
-        structure = self.classifier.structure(text)
+    def classify(self, text, fields):
+        response = {
+            'text': text
+        }
 
-        return {
-            'text': text,
-            'language': {
-                'code': language.max(),
-                'scores': language.dict(),
-                'confidence': language.confidence()
-            },
-            'sentiment': {
+        if 'sentiment' in fields:
+            sentiment = self.classifier.sentiment(text)
+
+            response['sentiment'] = {
                 'sentiment': sentiment.max(),
                 'scores': sentiment.dict(),
                 'confidence': sentiment.confidence()
-            },
-            'special': {
+            }
+
+
+        if 'language' in fields:
+            response['language'] = self.classifier.language(text)
+
+
+        if 'special' in fields:
+            special = self.classifier.special(text)
+
+            response['special'] = {
                 'sentiment': special.max(),
                 'scores': special.dict(),
                 'confidence': special.confidence()
-            },
-            'structure': structure
-        }
+            }
+
+
+        if 'structure' in fields:
+            response['structure'] = self.classifier.structure(text)
+
+
+        return response
 
 
     def handle(self, query):
+        fields = []
+        if ('fields' in query):
+            fields = query['fields'][0].split(',')
+
         if 'text' in query:
-            return self.classify(query['text'][0])
+            return self.classify(query['text'][0], fields)
 
         if 'texts' in query:
             results = []
             for text in query['texts']:
-                results.append(self.classify(text))
+                results.append(self.classify(text), fields)
 
             return {
                 'texts': results

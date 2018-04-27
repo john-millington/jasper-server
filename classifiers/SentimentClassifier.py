@@ -4,8 +4,7 @@ from classifiers.Classifier import Classifier
 from trainers.ProbDist import ProbDist
 
 class SentimentClassifier(Classifier):
-    def __init__(self):
-        self.type = 'sentiment'
+    TYPE = 'sentiment'
 
     # def prob_classify(self, features):
     #     keys = sorted(self.classifiers.keys())

@@ -1,11 +1,12 @@
+import json
 import math
 
 from classifiers.Classifier import Classifier
 from trainers.ProbDist import ProbDist
 
 class LanguageClassifier(Classifier):
-    def __init__(self):
-        self.type = 'language'
+    LANGAUGE_INFO = json.load(open('./classifiers/data/languages.json'))
+    TYPE = 'language'
 
     def prob_classify(self, features):
         keys = sorted(self.classifiers.keys())
@@ -29,3 +30,14 @@ class LanguageClassifier(Classifier):
         confidence = (max_result - max(copied_results))
 
         return ProbDist(dict(zip(keys, results)), confidence)
+
+    def get(self, features):
+        classification = self.prob_classify(features)
+        
+        resolved = classification.max()
+        confidence = classification.confidence()
+
+        info = self.LANGAUGE_INFO['languages'][resolved]
+        info['confidence'] = confidence
+
+        return info

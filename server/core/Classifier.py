@@ -32,7 +32,7 @@ class Classifier:
 
     def language(self, text):
         features = self.language_features.get(text)
-        return self.language_classifier.prob_classify(features)
+        return self.language_classifier.get(features)
 
     def sentiment(self, text):
         features = self.sentiment_features.get(text)

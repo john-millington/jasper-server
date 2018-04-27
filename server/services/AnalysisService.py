@@ -38,18 +38,6 @@ class AnalysisService(SearchService):
             sentiment_max = sentiment.max()
             special_max = special.max()
 
-            if (sentiment_max == 'neutral'):
-                if (special_max not in ['sadness', 'surprise', 'fear', 'joy']):
-                    continue
-
-            if (sentiment_max == 'positive'):
-                if (special_max not in ['joy', 'love']):
-                    continue
-
-            if (sentiment_max == 'negative'):
-                if (special_max not in ['anger', 'sadness']):
-                    continue
-
             meta = result['meta']
 
             curation = {
@@ -59,13 +47,19 @@ class AnalysisService(SearchService):
                 }
             }
 
-            if ('sentiment' in fields):
-                
-                curation['sentiment'] = {
-                    'sentiment': sentiment.max(),
-                    'scores': sentiment.dict(),
-                    'confidence': sentiment.confidence()
-                }
+            sarcasm = False
+            if (sentiment_max == 'positive'):
+                if (special_max in ['anger', 'sadness']):
+                    sarcasm = True
+
+            if (sentiment_max == 'negative'):
+                if (special_max in ['love', 'joy']):
+                    sarcasm = True
+
+            curation['sarcasm'] = {
+                'sarcasm': sarcasm,
+                'confidence': (sentiment.confidence() + special.confidence()) / 2
+            }
 
             if ('language' in fields):
                 language = self.classifier.language(text)
@@ -74,16 +68,24 @@ class AnalysisService(SearchService):
                     'confidence': language.confidence()
                 }
 
-            if ('special' in fields):
-                curation['special'] = {
-                    'sentiment': special.max(),
-                    'scores': special.dict(),
-                    'confidence': special.confidence()
-                }
+            if (sarcasm == False):
+                if ('sentiment' in fields):    
+                    curation['sentiment'] = {
+                        'sentiment': sentiment.max(),
+                        'scores': sentiment.dict(),
+                        'confidence': sentiment.confidence()
+                    }
 
-            if ('structure' in fields):
-                structure = self.classifier.structure(text)
-                curation['structure'] = structure
+                if ('special' in fields):
+                    curation['special'] = {
+                        'sentiment': special.max(),
+                        'scores': special.dict(),
+                        'confidence': special.confidence()
+                    }
+
+                if ('structure' in fields):
+                    structure = self.classifier.structure(text)
+                    curation['structure'] = structure
 
             curated.append(curation)
 
