@@ -40,7 +40,15 @@ class JasperServer(BaseHTTPRequestHandler):
         
         service = parsed_params.path
         if (service in JasperServer.SERVICES):
-            response = JasperServer.SERVICES[service].handle(request_body)
+            try:
+                response = JasperServer.SERVICES[service].handle(request_body)
+            except:
+                response = {
+                    'error': {
+                        'message': 'internal service error',
+                        'code': 'JS_ERR_5000'
+                    }
+                }
         else:
             response = {
                 'error': {

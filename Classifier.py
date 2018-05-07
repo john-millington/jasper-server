@@ -9,7 +9,8 @@ from corpus.LanguageDetectFeatures import LanguageDetectFeatures
 from classifiers.Classifier import Classifier
 
 class Classifier:
-    PICKLE_SENTIMENT_PATH = './classifiers/pickled/sentiment-classifier.pickle'
+    # PICKLE_SENTIMENT_PATH = './classifiers/pickled/sentiment-classifier.pickle'
+    PICKLE_SENTIMENT_PATH = './classifiers/pickled/sentiment-superset.pickle'
     PICKLE_LANGUAGE_PATH = './classifiers/pickled/language-classifier.pickle'
     PICKLE_SPECIAL_PATH = './classifiers/pickled/special-classifier.pickle'
 

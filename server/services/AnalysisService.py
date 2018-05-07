@@ -48,18 +48,18 @@ class AnalysisService(SearchService):
             }
 
             sarcasm = False
-            if (sentiment_max == 'positive'):
-                if (special_max in ['anger', 'sadness']):
-                    sarcasm = True
+            # if (sentiment_max == 'positive'):
+            #     if (special_max in ['anger', 'sadness']):
+            #         sarcasm = True
 
-            if (sentiment_max == 'negative'):
-                if (special_max in ['love', 'joy']):
-                    sarcasm = True
+            # if (sentiment_max == 'negative'):
+            #     if (special_max in ['love', 'joy']):
+            #         sarcasm = True
 
-            curation['sarcasm'] = {
-                'sarcasm': sarcasm,
-                'confidence': (sentiment.confidence() + special.confidence()) / 2
-            }
+            # curation['sarcasm'] = {
+            #     'sarcasm': sarcasm,
+            #     'confidence': (sentiment.confidence() + special.confidence()) / 2
+            # }
 
             if ('language' in fields):
                 language = self.classifier.language(text)

@@ -115,7 +115,7 @@ class SearchService:
                 'meta': {
                     'type': 'search.tweet',
                     'reply_to': result['in_reply_to_status_id_str'],
-                    'created': formatted,
+                    'created_at': formatted,
                     'timestamp': timestamp
                 }
             })
