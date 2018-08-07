@@ -13,11 +13,11 @@ from trainers.RecursiveRegressionClassifier import RecursiveRegressionClassifier
 parser = argparse.ArgumentParser()
 parser.add_argument('-n', '--name', help='Name of the classifier - it will be saved to a file named the same under the trainers/trained path', required=True)
 parser.add_argument('-l', '--library', help='Name of the library to train against', default='wiki-languages-train')
-parser.add_argument('-s', '--size', help='Size of sample to train against', default=2000, type=int)
-parser.add_argument('-b', '--block', help='Size of block to add in each iteration', default=100, type=int)
+parser.add_argument('-s', '--size', help='Size of sample to train against', default=4000, type=int)
+parser.add_argument('-b', '--block', help='Size of block to add in each iteration', default=150, type=int)
 parser.add_argument('-t', '--threads', help='Number of threads to run the training algorithm in', default=1, type=int)
 parser.add_argument('-f', '--testlibrary', help='The library to test against', default='wiki-languages-train')
-parser.add_argument('-c', '--testcount', help='The size of the test library', default=4000, type=int)
+parser.add_argument('-c', '--testcount', help='The size of the test library', default=20000, type=int)
 
 args = parser.parse_args()
 
@@ -28,26 +28,37 @@ if args.name != None:
     libraries = args.library.split(',')
     testlibraries = args.testlibrary.split(',')
 
-    # languages = [
-    #     'en', 'vi', 'fr', 'ceb', 'sv', 
-    #     'es', 'de', 'ru', 'zh', 'it', 
-    #     'pt', 'sh', 'fa', 'sr', 'nl', 
-    #     'ar', 'ja', 'war', 'pl', 'uk', 
-    #     'id', 'ro', 'ko', 'tr', 'ca', 
-    #     'no', 'hu', 'fi', 'cs', 'he',
-    #     'ms', 'hy', 'da', 'hi', 'ur',
-    #     'eu', 'zh-min-nan', 'th', 'uz', 'bn',
-    #     'eo', 'bg', 'kk', 'be', 'sk',
-    #     'hr', 'el', 'lt', 'et', 'mk',
-    #     'sl', 'bs', 'gl', 'ml', 'az',
-    #     'ka', 'lv', 'ta', 'nn', 'min',
-    #     'la', 'vo', 'tl', 'te', 'mg',
-    #     'cy', 'mr', 'sq', 'new', 'ce',
-    #     'tt', 'sco', 'tg', 'zh-yue', 'arz',
-    #     'oc', 'azb', 'af', 'ckb', 'lb'
-    # ]
+    languages = [
+        'en', 'vi', 'fr', 'ceb', 'sv', 
+        'es', 'de', 'ru', 'zh', 'it', 
+        'pt', 'sh', 'fa', 'sr', 'nl', 
+        'ar', 'ja', 'war', 'pl', 'uk', 
+        'id', 'ro', 'ko', 'tr', 'ca', 
+        'no', 'hu', 'fi', 'cs', 'he',
+        'ms', 'hy', 'da', 'hi', 'ur',
+        'eu', 'zh-min-nan', 'th', 'uz', 'bn',
+        'eo', 'bg', 'kk', 'be', 'sk',
+        'hr', 'el', 'lt', 'et', 'mk',
+        'sl', 'bs', 'gl', 'ml', 'az',
+        'ka', 'lv', 'ta', 'nn', 'min',
+        'la', 'vo', 'tl', 'te', 'mg',
+        'cy', 'mr', 'sq', 'new', 'ce',
+        'tt', 'sco', 'tg', 'zh-yue', 'arz',
+        'oc', 'azb', 'af', 'ckb'
+    ]
 
-    languages = ['en', 'zh']
+    languages = [
+        'bg', 'cs', 'da', 'de', 'el', 
+        'en', 'es', 'et', 'fi', 'fr', 
+        'hu', 'it', 'lt', 'lv', 'nl', 
+        'pl', 'pt', 'ro', 'sk', 'sl', 
+        'sv', 'no'
+    ]
+
+    languages = [
+        'en', 'es', 'da', 'de', 'no',
+        'it', 'pl', 'nl', 'sv', 'pt'
+    ]
 
     tests = []
     for library in testlibraries:
@@ -84,13 +95,9 @@ if args.name != None:
 
         with open(f'trainers/trained/{args.name}.json', 'w') as jsonout:
             json.dump({
+                **result,
                 'libraries': libraries,
                 'tested': testlibraries,
-                'en': result['en'],
-                'de': result['de'],
-                'fr': result['fr'],
-                'it': result['it'],
-                'es': result['es'],
                 'classifier': f'{args.name}.pickle',
                 'time': str(datetime.timedelta(seconds=end - start))
             }, jsonout, indent=4, sort_keys=True)

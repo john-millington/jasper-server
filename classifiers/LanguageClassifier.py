@@ -8,13 +8,42 @@ class LanguageClassifier(Classifier):
     LANGAUGE_INFO = json.load(open('./classifiers/data/languages.json'))
     TYPE = 'language'
 
+    # def prob_classify(self, features):
+    #     keys = sorted(self.classifiers.keys())
+    #     results = [1] * len(keys)
+
+    #     for (key_index, layer) in enumerate(keys):
+    #         result = self.classifiers[layer].prob_classify(features)
+    #         results[key_index] = result.prob(layer)
+
+    #     for (index, value) in enumerate(results):
+    #         results[index] = math.exp(value)
+            
+    #     totals = sum(results)
+    #     for (index, value) in enumerate(results):
+    #         results[index] = (value / totals)
+
+    #     copied_results = results[:]
+    #     max_result = max(copied_results)
+    #     copied_results.remove(max_result)
+        
+    #     confidence = (max_result - max(copied_results))
+
+    #     return ProbDist(dict(zip(keys, results)), confidence)
+
+
     def prob_classify(self, features):
         keys = sorted(self.classifiers.keys())
         results = [1] * len(keys)
-
+        
         for (key_index, layer) in enumerate(keys):
             result = self.classifiers[layer].prob_classify(features)
-            results[key_index] = result.prob(layer)
+
+            for (result_index, value) in enumerate(results):
+                if result_index == key_index:
+                    results[result_index] = (value + (result.prob(layer) * len(results)))
+                else:
+                    results[result_index] = (value + result.prob('untagged_label'))
 
         for (index, value) in enumerate(results):
             results[index] = math.exp(value)
@@ -26,7 +55,6 @@ class LanguageClassifier(Classifier):
         copied_results = results[:]
         max_result = max(copied_results)
         copied_results.remove(max_result)
-        
         confidence = (max_result - max(copied_results))
 
         return ProbDist(dict(zip(keys, results)), confidence)

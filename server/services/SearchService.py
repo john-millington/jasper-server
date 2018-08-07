@@ -8,6 +8,9 @@ from TwitterAPI import TwitterAPI
 class SearchService:
     SOURCES_FILE = './server/services/data/sources.json'
 
+    NEWS_LIMIT = 100
+    TWITTER_LIMIT = 100
+
     def __init__(self):
         self.twitter_client = TwitterAPI(
             os.environ.get('TWITTER_CONSUMER_KEY'),
@@ -29,28 +32,7 @@ class SearchService:
         return ','.join(sources)
 
 
-    def handle(self, query):
-        if 'q' in query:
-            response = {
-                'tweets': self.tweets(query),
-                'news': self.news(query)
-            }
-
-            return response
-        
-        return {
-            'error': {
-                'message': 'missing parameters',
-                'code': 'JS_ERR_1000'
-            }
-        }
-
-    
-    def news(self, query):
-        count = 20
-        if ('count' in query):
-            count = query['count'][0]
-
+    def get_news(self, query, count):
         response = self.news_client.get_everything(
             q=query['q'][0],
             sources=self.get_source_list(),
@@ -88,11 +70,7 @@ class SearchService:
         return articles
 
     
-    def tweets(self, query):
-        count = 20
-        if ('count' in query):
-            count = query['count'][0]
-
+    def get_tweets(self, query, count):
         results = self.twitter_client.request('search/tweets', { 
             'q': query['q'][0] + ' -filter:retweets',
             'tweet_mode': 'extended',
@@ -119,5 +97,58 @@ class SearchService:
                     'timestamp': timestamp
                 }
             })
+
+        return tweets
+
+
+    def handle(self, query):
+        if 'q' in query:
+            response = {
+                'tweets': self.tweets(query),
+                'news': self.news(query)
+            }
+
+            return response
+        
+        return {
+            'error': {
+                'message': 'missing parameters',
+                'code': 'JS_ERR_1000'
+            }
+        }
+
+    
+    def news(self, query):
+        count = 20
+        if ('count' in query):
+            count = int(query['count'][0])
+
+        articles = []
+        while (count > 0):
+            actual_count = count
+            if (actual_count > self.NEWS_LIMIT):
+                actual_count = self.NEWS_LIMIT
+
+            articles = articles + self.get_news(query, actual_count)
+            count = count - self.NEWS_LIMIT
+
+        return articles
+
+    
+    def tweets(self, query):
+        count = 20
+        if ('count' in query):
+            count = int(query['count'][0])
+
+        tweets = []
+        while (count > 0):
+            actual_count = count
+            if (actual_count > self.TWITTER_LIMIT):
+                actual_count = self.TWITTER_LIMIT
+
+            print(actual_count)
+
+            tweets = tweets + self.get_tweets(query, actual_count)
+            count = count - self.TWITTER_LIMIT
 
         return tweets
