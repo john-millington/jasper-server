@@ -12,9 +12,11 @@ class MultilayeredRecursiveRegression:
         self.feature_data = config['feature_data']
         self.test_data = config['test_data']
 
+    
     def classify(self, features):
         return self.prob_classify(features).max()
 
+    
     # TODO
     # TODO - This algorithm needs work, total bollocks
     # TODO
@@ -22,29 +24,9 @@ class MultilayeredRecursiveRegression:
         keys = sorted(self.classifiers.keys())
         results = [1] * len(keys)
 
-        untagged = 0
-        mixed_prob = 0
-
         for (key_index, layer) in enumerate(keys):
             result = self.classifiers[layer].prob_classify(features)
-
-            untagged = (untagged + result.prob('untagged_label')) / 2
-            for_layer = result.prob(layer)
-            if (for_layer > 0.7):
-                mixed_prob = mixed_prob + (for_layer * len(results))
-
-            polarity = for_layer - untagged
-
-            for (result_index, value) in enumerate(results):
-                if result_index == key_index:
-                    # results[inner_index] = max(0.01, result.prob(layer) + polarity)
-                    results[result_index] = (value + (result.prob(layer) * len(results)))
-                    # results[inner_index] = result.prob(layer)
-                else:
-                    results[result_index] = (value + untagged)
-
-        results.append(mixed_prob)
-        keys.append('mixed')
+            results[key_index] = result.prob(layer)
 
         for (index, value) in enumerate(results):
             results[index] = math.exp(value)
@@ -60,9 +42,11 @@ class MultilayeredRecursiveRegression:
 
         return ProbDist(dict(zip(keys, results)), confidence)
 
+    
     def recast(self, type):
         return type(self.classifiers)
 
+    
     def get_layers(self, feature_set):
         separated = {}
         for labeled_features in feature_set:
@@ -97,6 +81,7 @@ class MultilayeredRecursiveRegression:
             'layers': layers
         }
 
+    
     def train(self):
         layers = self.get_layers(self.feature_data)
         test_layers = self.get_layers(self.test_data)
@@ -121,6 +106,7 @@ class MultilayeredRecursiveRegression:
         self.results['classifier'] = self
         return self.results
 
+    
     def untag(self, feature_set):
         copied = []
         for labeled_feature in feature_set:

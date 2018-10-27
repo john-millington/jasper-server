@@ -12,3 +12,4 @@ PIP Libraries
 
 nltk
 pytextrank
+fuzzy

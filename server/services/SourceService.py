@@ -5,6 +5,7 @@ import urllib.parse
 
 from server.core.Classifier import Classifier
 from server.services.SearchService import SearchService
+from newspaper import Article
 
 class SourceService(SearchService):
     def __init__(self):
@@ -31,11 +32,12 @@ class SourceService(SearchService):
     
     def news(self, query):
         source = query['meta']['source_url']
-        source_encode = urllib.parse.quote(source, safe='')
-        clean_text = requests.get('http://boilerpipe-web.appspot.com/extract?url={}&extractor=ArticleExtractor&output=json'.format(source_encode))
-        json_dump = clean_text.json()
 
-        text = json_dump['response']['content']
+        parsed = Article(source)
+        parsed.download()
+        parsed.parse()
+
+        text = parsed.text
         text_split = text.split('\n')
         for (index, item) in enumerate(text_split):
             text_split[index] = '<p class="result-view__paragraph">{}</p>'.format(item)
@@ -45,7 +47,7 @@ class SourceService(SearchService):
         return {
             'contents': [ 
                 {
-                    'title': json_dump['response']['title'],
+                    'title': parsed.title,
                     'text': formatted,
                     'source': query['source'],
                     'meta': query['meta']

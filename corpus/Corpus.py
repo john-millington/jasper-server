@@ -47,7 +47,7 @@ class Corpus:
         resources = []
         for x in range(1, max_chunks + 1):
             data = json.load(open('./corpus/data/{}/chunks/{}.chunk{}.json'.format(resource, type, x)))
-            for line in data["lines"]:
+            for line in data["lines"][0:size]:
                 if 'value' in line and 'classification' in line:
                     resources.append([self.features.get(line["value"]), line['classification']])
 

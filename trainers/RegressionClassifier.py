@@ -74,10 +74,13 @@ class RegressionClassifier:
 
     def regress(self, best_set, best_score, iteration = 0):
         classifier = None
+        best_set.sort(key=lambda entry:entry[1])
 
-        for i in range(0, len(best_set)):
+        for i in range(0, int(len(best_set) / 2)):
             clone = best_set[:]
+            
             del clone[i]
+            del clone[len(clone) - (i + 1)]
 
             os.system('clear')
             print('Title: {}'.format(self.name))
