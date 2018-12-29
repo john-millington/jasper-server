@@ -46,6 +46,22 @@ class Entity:
     }
   }
 
+  COMPLEX_CLAIMS = {
+    'singulars': {
+      'stock': {
+        'claim': {
+          'id': 'P414',
+          'name': 'market'
+        },
+        'qualifier': {
+          'id': 'P249',
+          'name': 'ticker'
+        }
+      }
+    },
+    'plurals': {}
+  }
+
   def __init__(self, entity, qualifier = EntityQualifierType.CURRENT):
     self.entity = entity
     self.qualifier = qualifier
@@ -71,6 +87,12 @@ class Entity:
       claims_values = self.get_claims_values(plurals[claim])
       if claims_values != None and len(claims_values) > 0:
         extracted[claim] = claims_values
+
+    complex_singulars = Entity.COMPLEX_CLAIMS['singulars']
+    for claim in complex_singulars:
+      complex_values = self.get_complex_claim(complex_singulars[claim])
+      if (len(complex_values) > 0):
+        extracted[claim] = complex_values[0]
 
     return extracted
 
@@ -106,14 +128,19 @@ class Entity:
     return claims_values
 
 
-  def get_claims(self, prop):
+  def get_claims(self, prop, qualifier = None):
     values = []
     if 'claims' in self.entity and prop in self.entity['claims']:
       claims = self.entity['claims'][prop]
       for claim in claims:
         if (self.qualify(claim)):
-          if 'mainsnak' in claim and 'datavalue' in claim['mainsnak']:
-            values.append(claim['mainsnak']['datavalue'])
+          if qualifier == None:
+            if 'mainsnak' in claim and 'datavalue' in claim['mainsnak']:
+              values.append(claim['mainsnak']['datavalue'])
+          else:
+            if qualifier in claim['qualifiers']:
+              qualifiers = claim['qualifiers'][qualifier]
+              values.append(qualifiers[0]['datavalue'])
 
     return values
 
@@ -121,7 +148,7 @@ class Entity:
   def get_image(self):
     image = None
 
-    claim = self.get_preferred_claim(['P154', 'P41', 'P94', 'P18'])
+    claim = self.get_preferred_claim(['P154', 'P41', 'P18', 'P94'])
     if claim != None and 'value' in claim:
       found = claim['value']
       
@@ -155,6 +182,30 @@ class Entity:
         break
 
     return claim_value
+
+
+  def get_complex_claim(self, claim):
+    claims_result = []
+
+    claim_id = claim['claim']['id']
+    claim_name = claim['claim']['name']
+
+    qualifier_id = claim['qualifier']['id']
+    qualifier_name = claim['qualifier']['name']
+
+    claims = self.get_claims(claim_id)
+    qualifiers = self.get_claims(claim_id, qualifier_id)
+
+    for index, claim_value in enumerate(claims):
+      qualifier_value = qualifiers[index]
+
+      individual = {}
+      individual[claim_name] = claim_value['value']
+      individual[qualifier_name] = qualifier_value['value']
+
+      claims_result.append(individual)
+
+    return claims_result
 
 
   def get_value(self, prop, lang = 'en'):

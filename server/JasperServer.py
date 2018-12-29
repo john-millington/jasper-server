@@ -4,6 +4,8 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
+from server.RequestType import RequestType
+
 from server.services.AnalysisService import AnalysisService
 from server.services.ClassifyService import ClassifyService
 from server.services.EntityService import EntityService
@@ -25,7 +27,7 @@ class JasperServer(BaseHTTPRequestHandler):
         parsed_params = urlparse(self.path)
         request_body = parse_qs(parsed_params.query)
 
-        self.handle_service_request(request_body)
+        self.handle_service_request(request_body, RequestType.GET)
 
     
     def do_POST(self):
@@ -34,16 +36,16 @@ class JasperServer(BaseHTTPRequestHandler):
         # json_data = post_data.decode('utf8')
         post_dict = json.loads(post_data)
 
-        self.handle_service_request(post_dict)
+        self.handle_service_request(post_dict, RequestType.POST)
 
 
-    def handle_service_request(self, request_body):
+    def handle_service_request(self, request_body, request_type):
         parsed_params = urlparse(self.path)
         
         service = parsed_params.path
         if (service in JasperServer.SERVICES):
             # try:
-                response = JasperServer.SERVICES[service].handle(request_body)
+                response = JasperServer.SERVICES[service].handle(request_body, request_type)
             # except:
             #     response = {
             #         'error': {

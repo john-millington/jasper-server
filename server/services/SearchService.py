@@ -75,14 +75,25 @@ class SearchService:
 
     
     def get_tweets(self, query, count):
-        results = self.twitter_client.request('search/tweets', { 
+        tweet_query = { 
             'q': query['q'][0] + ' -filter:retweets',
             'tweet_mode': 'extended',
             'count': count,
             'lang': 'en',
             'result_type': 'recent',
             'include_entities': 'false'
-        })
+        }
+
+        if ('order' in query):
+            tweet_query['result_type'] = query['order']
+
+        if ('until' in query):
+            tweet_query['until'] = query['until']
+
+        if ('since' in query):
+            tweet_query['since_id'] = query['since']
+
+        results = self.twitter_client.request('search/tweets', tweet_query)
 
         tweets = []
         for result in results:
@@ -105,7 +116,7 @@ class SearchService:
         return tweets
 
 
-    def handle(self, query):
+    def handle(self, query, type):
         if 'q' in query:
             tweets = self.tweets(query)
             news = self.news(query)

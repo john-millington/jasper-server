@@ -10,11 +10,16 @@ class SpecialClassifier(Classifier):
         keys = sorted(self.classifiers.keys())
         results = [1] * len(keys)
 
-        mixed = 0
+        mixed = -0.5
         for (key_index, layer) in enumerate(keys):
             result = self.classifiers[layer].prob_classify(features)
-            results[key_index] = (result.prob(layer) * len(results))
-            mixed += result.prob(layer)
+            results[key_index] = result.prob(layer)
+
+            if (result.prob(layer) > 0.5):
+                mixed += result.prob(layer)
+
+        results.append(0.5)
+        keys.append('neutral')
 
         results.append(mixed)
         keys.append('mixed')

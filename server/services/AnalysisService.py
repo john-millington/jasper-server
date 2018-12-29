@@ -3,6 +3,7 @@ import random
 import spacy
 
 from corpus.KeyPhrase import KeyPhrase
+from corpus.KeyPhrase2 import KeyPhrase2
 from corpus.StringParser import StringParser
 from corpus.Topics import Topics
 from server.core.Classifier import Classifier
@@ -34,13 +35,6 @@ class AnalysisService(SearchService):
         curated = []
         for result in results:
             text = result['text']
-
-            sentiment = self.classifier.sentiment(text)
-            special = self.classifier.special(text)
-
-            sentiment_max = sentiment.max()
-            special_max = special.max()
-
             meta = result['meta']
 
             curation = {
@@ -50,30 +44,13 @@ class AnalysisService(SearchService):
                 }
             }
 
-            sarcasm = False
-            # if (sentiment_max == 'positive'):
-            #     if (special_max in ['anger', 'sadness']):
-            #         sarcasm = True
-
-            # if (sentiment_max == 'negative'):
-            #     if (special_max in ['love', 'joy']):
-            #         sarcasm = True
-
-            # curation['sarcasm'] = {
-            #     'sarcasm': sarcasm,
-            #     'confidence': (sentiment.confidence() + special.confidence()) / 2
-            # }
 
             if ('language' in fields):
-                language = self.classifier.language(text)
-                curation['language'] = {
-                    'code': language.max(),
-                    'confidence': language.confidence()
-                }
+                curation['language'] = self.classifier.language(text)
 
 
             if ('phrases' in fields):
-                phrases = KeyPhrase.extract(text)
+                phrases = KeyPhrase2.extract(text)
                 curation['phrases'] = phrases
 
             
@@ -82,28 +59,42 @@ class AnalysisService(SearchService):
                 curation['perspective'] = self.get_perspective(parsed.print_tree(), 1, [])
 
 
-            if (sarcasm == False):
-                if ('sentiment' in fields):    
-                    curation['sentiment'] = {
-                        'sentiment': sentiment.max(),
-                        'scores': sentiment.dict(),
-                        'confidence': sentiment.confidence()
-                    }
+            if ('sentiment' in fields):
+                sentiment = self.classifier.sentiment(text)
+                
+                curation['sentiment'] = {
+                    'sentiment': sentiment.max(),
+                    'scores': sentiment.dict(),
+                    'confidence': sentiment.confidence()
+                }
 
-                if ('emotion' in fields):
-                    curation['emotion'] = {
-                        'emotion': special.max(),
-                        'scores': special.dict(),
-                        'confidence': special.confidence()
-                    }
 
-                if ('structure' in fields):
-                    structure = self.classifier.structure(text)
-                    curation['structure'] = structure
+            if ('emotion' in fields):
+                emotion = self.classifier.special(text)
+                emotion_type = emotion.max()
+                confidence = emotion.confidence()
+
+                if ('threshold' in query):
+                    if confidence < (float(query['threshold'][0]) / 100):
+                        emotion_type = 'neutral'
+                        confidence = (float(query['threshold'][0]) / 100)
+
+
+                curation['emotion'] = {
+                    'emotion': emotion_type,
+                    'scores': emotion.dict(),
+                    'confidence': confidence
+                }
+
+
+            if ('structure' in fields):
+                structure = self.classifier.structure(text)
+                curation['structure'] = structure
 
             curated.append(curation)
 
         return {
+            'count': len(curated),
             'results': curated
         }
 
@@ -135,7 +126,7 @@ class AnalysisService(SearchService):
         return None
 
 
-    def handle(self, query):
+    def handle(self, query, type):
         if 'q' in query:
             fields = []
             if ('fields' in query):
@@ -144,7 +135,8 @@ class AnalysisService(SearchService):
             response = self.analyse(query, fields)
             if ('topics' in query):
                 count = int(query['topics'][0])
-                response['topics'] = Topics.analyse(response['results'], count, query['q'])
+                response['topics'] = KeyPhrase2.topics(response['results'], count)
+                # response['topics'] = Topics.analyse(response['results'], count, query['q'])
 
             # self.store(response, fields)
             return response

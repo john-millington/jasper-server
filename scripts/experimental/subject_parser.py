@@ -13,6 +13,7 @@ subjects = []
 direct = []
 indirect = []
 attributional = []
+root = None
 
 def noun_phrase(item):
     ignore = [
@@ -71,9 +72,17 @@ def get_primary_subject(tree, level = 1, subjects = []):
         return reordered[0][0]
 
     return None
-        
+
+
+noun_chunks = []
+for chunk in parsed.noun_chunks:
+    print(chunk)
+
+print('----')
 
 for text in parsed:
+    print(text.orth_ + ": " + text.dep_)
+    
     if text.dep_ == 'nsubj' or text.dep_ == 'nsubjpass':
         subjects.append(noun_phrase(text))
 
@@ -86,10 +95,15 @@ for text in parsed:
     if text.dep_ == 'attr':
         attributional.append(noun_phrase(text))
 
+    if text.dep_ == 'ROOT':
+        root = noun_phrase(text)
+
 print(json.dumps({
+    'tree': parsed.print_tree(),
     'subject': get_primary_subject(parsed.print_tree()),
     'subjects': subjects,
     'direct': direct,
     'indirect': indirect,
-    'attributional': attributional
+    'attributional': attributional,
+    'root': root
 }, indent=4, sort_keys=True))

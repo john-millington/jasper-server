@@ -42,7 +42,7 @@ class ClassifyService:
         return response
 
 
-    def handle(self, query):
+    def handle(self, query, type):
         fields = []
         if ('fields' in query):
             fields = query['fields'][0].split(',')

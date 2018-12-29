@@ -7,6 +7,11 @@ from server.core.Classifier import Classifier
 from server.services.SearchService import SearchService
 from newspaper import Article
 
+IGNORE = [
+    'Join Independent Minds',
+    'Shape Created with Sketch'
+]
+
 class SourceService(SearchService):
     def __init__(self):
         # self.classifier = Classifier()
@@ -14,7 +19,7 @@ class SourceService(SearchService):
         super().__init__()
 
     
-    def handle(self, query):
+    def handle(self, query, type):
         if query['meta']['type'] == 'search.news':
             response = self.news(query)
         elif query['meta']['type'] == 'search.tweet':
@@ -40,7 +45,15 @@ class SourceService(SearchService):
         text = parsed.text
         text_split = text.split('\n')
         for (index, item) in enumerate(text_split):
-            text_split[index] = '<p class="result-view__paragraph">{}</p>'.format(item)
+            should_ignore = False
+            for (ignore_index, ignore) in enumerate(IGNORE):
+                if item.startswith(ignore):
+                    should_ignore = True
+
+            if (should_ignore):
+                text_split[index] = ''
+            else:
+                text_split[index] = '<p class="result-view__paragraph">{}</p>'.format(item)
 
         formatted = ''.join(text_split)
 
@@ -50,7 +63,10 @@ class SourceService(SearchService):
                     'title': parsed.title,
                     'text': formatted,
                     'source': query['source'],
-                    'meta': query['meta']
+                    'meta': {
+                        **query['meta'],
+                        'authors': parsed.authors
+                    }
                 }
             ]
         }
@@ -62,7 +78,7 @@ class SourceService(SearchService):
         }
 
         reply = query['meta']['reply_to']
-        if (reply != None):
+        while (reply != None):
             result = self.twitter_client.request('statuses/show/:%s' % reply, {
                 'tweet_mode': 'extended'
             })
@@ -77,6 +93,9 @@ class SourceService(SearchService):
                     }
                 })
 
+            reply = tweet['in_reply_to_status_id_str']
+
+        response['contents'].reverse()
         response['contents'].append(query)
 
         return response

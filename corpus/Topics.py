@@ -6,24 +6,82 @@ class Topics:
 
     @staticmethod
     def analyse(texts, count = 5, ignore = []):
-        topics = {}
+        topics = []
         for item in texts:
-            phrases = KeyPhrase.extract(item['text'])
-            for phrase in phrases:
+            for phrase in item['phrases']:
                 if phrase not in topics:
-                    topics[phrase] = 0
+                    topics.append(phrase)
+        
 
-                if phrase not in ignore:
-                    topics[phrase] = topics[phrase] + 1
+        revised = {}
+        for outer_topic in topics:
+            for inner_topic in topics:
+                similarity = Topics.similarity(outer_topic, inner_topic)
+                if (similarity['score'] > 0):
+                    if inner_topic not in revised:
+                        revised[inner_topic] = []
 
-        recast = []
-        for topic in topics:
-            recast.append({
-                'topic': topic,
-                'count': topics[topic]
-            })
+                    revised[inner_topic].append(similarity)
 
-        return sorted(Topics.dedupe(recast), key=lambda topic: topic['count'], reverse=True)[0:count]
+        for topic in revised:
+            results = revised[topic]
+
+            best = { 'score': 0.0 }
+            for similarity in results:
+                if similarity['score'] > best['score']:
+                    best = similarity
+
+            revised[topic] = best
+
+        final_topics = []
+        for topic in revised:
+            final_topics.append(revised[topic]['text'])
+
+        return final_topics
+
+        # topics = {}
+        # for item in texts:
+        #     phrases = KeyPhrase.extract(item['text'])
+        #     for phrase in phrases:
+        #         if phrase not in topics:
+        #             topics[phrase] = 0
+
+        #         if phrase not in ignore:
+        #             topics[phrase] = topics[phrase] + 1
+
+        # recast = []
+        # for topic in topics:
+        #     recast.append({
+        #         'topic': topic,
+        #         'count': topics[topic]
+        #     })
+
+        # return sorted(Topics.dedupe(recast), key=lambda topic: topic['count'], reverse=True)[0:count]
+
+    @staticmethod
+    def similarity(primary, secondary):
+        primary_split = primary.split(' ')
+        secondary_split = secondary.split(' ')
+
+        result = {
+            'score': 0,
+            'text': None
+        }
+
+        matches = []
+        for word in secondary_split:
+            if word in primary_split:
+                matches.append(word)
+
+        
+        if len(matches) > 1:
+            result['text'] = ' '.join(matches)
+            result['score'] = (len(matches) * 2) / (len(primary_split) + len(secondary_split))
+        
+        return result
+
+        
+
 
 
     @staticmethod
