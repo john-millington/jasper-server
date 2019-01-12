@@ -5,7 +5,6 @@ import spacy
 from corpus.KeyPhrase import KeyPhrase
 from corpus.KeyPhrase2 import KeyPhrase2
 from corpus.StringParser import StringParser
-from corpus.Topics import Topics
 from server.core.Classifier import Classifier
 from server.services.SearchService import SearchService
 
@@ -136,7 +135,6 @@ class AnalysisService(SearchService):
             if ('topics' in query):
                 count = int(query['topics'][0])
                 response['topics'] = KeyPhrase2.topics(response['results'], count)
-                # response['topics'] = Topics.analyse(response['results'], count, query['q'])
 
             # self.store(response, fields)
             return response

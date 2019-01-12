@@ -1,7 +1,10 @@
 from nltk.corpus import stopwords as StopWords
+import re
 import spacy
 
 class KeyPhrase2:
+  PUNCTUATION_REGEX = re.compile(r"[\?\!\—\(\)\[\]\{\}\,\.\-\|\"\'\:\;]?")
+
   NLP = spacy.load('en')
   STOPWORDS = StopWords.words('english')
 
@@ -28,17 +31,20 @@ class KeyPhrase2:
     linked_topics = {}
 
     for result in results:
-      words = result['text'].split(' ')
+      modified = re.sub(KeyPhrase2.PUNCTUATION_REGEX, '', result['text'])
+      words = modified.split(' ')
+      
       for (index, word) in enumerate(words):
-        if word.lower() in KeyPhrase2.STOPWORDS or len(word) == 0 or word[0].isupper() != True:
-          continue
-
         phrase = ''
         extension = 0
 
         phrases = []
         while extension < radius and len(words) > (index + extension):
-          phrase = (phrase + ' ' + words[(index + extension)]).strip()
+          current = words[(index + extension)].lower()
+          if (current in KeyPhrase2.STOPWORDS) or len(current) == 0:
+            break
+
+          phrase = (phrase + ' ' + current).strip()
           phrases.append(phrase)
 
           if phrase not in topics:
@@ -55,6 +61,7 @@ class KeyPhrase2:
           topics[phrase]['linked'].append(result)
           topics[phrase]['score'] = topics[phrase]['score'] + extension
 
+
         for phrase in phrases:
           copy = phrases.copy()
           copy.remove(phrase)
@@ -67,31 +74,31 @@ class KeyPhrase2:
 
     resorted = sorted(topics.values(), key=lambda topic: topic['score'], reverse=True)
 
-    for (index, resolved) in enumerate(resorted):
-      topics = linked_topics[resolved['phrase']]
+    # for (index, resolved) in enumerate(resorted):
+    #   topics = linked_topics[resolved['phrase']]
       
-      iteration_index = index + 1
-      while iteration_index < len(resorted):
-        inner_phrase = resorted[iteration_index]['phrase']
+    #   iteration_index = index + 1
+    #   while iteration_index < len(resorted):
+    #     inner_phrase = resorted[iteration_index]['phrase']
         
-        is_duplicate = inner_phrase in topics
-        # if is_duplicate != True:
-        #   is_duplicate = inner_phrase in resolved['phrase'] or resolved['phrase'] in inner_phrase
+    #     is_duplicate = inner_phrase in topics
+    #     # if is_duplicate != True:
+    #     #   is_duplicate = inner_phrase in resolved['phrase'] or resolved['phrase'] in inner_phrase
 
-        if is_duplicate == True:
-          duplicate = resorted[iteration_index]
+    #     if is_duplicate == True:
+    #       duplicate = resorted[iteration_index]
 
-          for linked in duplicate['linked']:
-            if linked not in resolved['linked']:
-              # resolved['linked'].append(linked)
-              resolved['count'] = resolved['count'] + 1
-              resolved['score'] = resolved['score'] + len(inner_phrase.split(' '))
+    #       for linked in duplicate['linked']:
+    #         if linked not in resolved['linked']:
+    #           # resolved['linked'].append(linked)
+    #           resolved['count'] = resolved['count'] + 1
+    #           resolved['score'] = resolved['score'] + len(inner_phrase.split(' '))
           
-          resorted.remove(duplicate)
-          linked_topics[resolved['phrase']].extend(linked_topics[duplicate['phrase']])
+    #       resorted.remove(duplicate)
+    #       linked_topics[resolved['phrase']].extend(linked_topics[duplicate['phrase']])
 
-        else:
-          iteration_index = iteration_index + 1
+    #     else:
+    #       iteration_index = iteration_index + 1
 
 
     preprocessed = sorted(resorted, key=lambda topic: topic['score'], reverse=True)[0:count]

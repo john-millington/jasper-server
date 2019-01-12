@@ -9,6 +9,7 @@ from server.RequestType import RequestType
 from server.services.AnalysisService import AnalysisService
 from server.services.ClassifyService import ClassifyService
 from server.services.EntityService import EntityService
+from server.services.FeedbackService import FeedbackService
 from server.services.SearchService import SearchService
 from server.services.SourceService import SourceService
 
@@ -19,6 +20,7 @@ class JasperServer(BaseHTTPRequestHandler):
         '/api/analyse': AnalysisService(),
         '/api/classify': ClassifyService(),
         '/api/entities': EntityService(),
+        '/api/feedback': FeedbackService(),
         '/api/search': SearchService(),
         '/api/source': SourceService()
     }
