@@ -4,7 +4,6 @@ import spacy
 
 from corpus.KeyPhrase import KeyPhrase
 from corpus.KeyPhrase2 import KeyPhrase2
-from corpus.StringParser import StringParser
 from server.core.Classifier import Classifier
 from server.services.SearchService import SearchService
 

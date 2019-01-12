@@ -2,10 +2,7 @@ import re
 import nltk
 import string
 
-from pattern.en import spelling
 from nltk.corpus import wordnet
-from symspell.SymSpell import SymSpell
-
 from corpus.Contractions import Contractions
 
 class StringParser:
@@ -15,20 +12,11 @@ class StringParser:
     PUNCTUATION_TABLE = dict((ord(char), None) for char in string.punctuation)
     PUNCTUATION_REGEX = re.compile(r"[\?\!\—\(\)\[\]\{\}\,\.\-\|\"]?")
     LEMMATISER = nltk.WordNetLemmatizer()
-    SPELLING = SymSpell()
-
-    @staticmethod
-    def correct(text):
-        reduced = StringParser.reduce(text)
-        corrected = StringParser.SPELLING.lookup(reduced, 0, 1)
-
-        return corrected[0].term
 
 
     @staticmethod
     def parse(text):
         modified = Contractions.expand(text.lower())
-        # modified = StringParser.correct(modified)
 
         try:
             modified = re.sub(StringParser.TWITTER_REGEX, '', modified)
@@ -50,12 +38,6 @@ class StringParser:
                 lemmatised.append(StringParser.LEMMATISER.lemmatize(pos[0]))
 
         return lemmatised
-        
-
-    @staticmethod
-    def reduce(text):
-        pattern = re.compile(r"(.)\1{2,}")
-        return pattern.sub(r"\1\1", text)
 
 
     @staticmethod
