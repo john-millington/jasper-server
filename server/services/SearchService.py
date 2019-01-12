@@ -2,7 +2,6 @@ import json
 import sys
 import os
 import re
-import pytextrank
 
 from dateutil.parser import parse
 
@@ -121,7 +120,6 @@ class SearchService:
             tweets = self.tweets(query)
             news = self.news(query)
 
-            # themes = self.themes(tweets, news)
             response = {
                 'tweets': tweets,
                 'news': news
@@ -152,38 +150,6 @@ class SearchService:
             count = count - self.NEWS_LIMIT
 
         return articles
-
-
-    def themes(self, tweets, news):
-        stage0 = 'stage0.json'
-        stage1 = 'stage1.json'
-
-        with open(stage0, 'w') as source:
-            for tweet in tweets:
-                tweet['id'] = tweet['meta']['timestamp']
-                source.write(json.dumps(tweet))
-                source.write('\n')
-
-            for article in news:
-                article['id'] = article['meta']['timestamp']
-                source.write(json.dumps(article))
-                source.write('\n')
-
-        with open(stage1, 'w') as graph_output:
-            for graf in pytextrank.parse_doc(pytextrank.json_iter(stage0)):
-                graph_output.write("%s\n" % pytextrank.pretty_print(graf._asdict()))
-
-        graph, ranks = pytextrank.text_rank(stage1)
-        pytextrank.render_ranks(graph, ranks)
-
-        themes = []
-        for rl in pytextrank.normalize_key_phrases(stage1, ranks):
-            themes.append(rl)
-
-        os.remove(stage0)
-        os.remove(stage1)
-
-        return rl
 
     
     def tweets(self, query):
