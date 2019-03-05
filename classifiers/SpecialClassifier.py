@@ -3,6 +3,15 @@ import math
 from classifiers.Classifier import Classifier
 from trainers.ProbDist import ProbDist
 
+EMOTION_CARDINALS = {
+    'anger': 0,
+    'fear': 0,
+    'joy': 2,
+    'sadness': 0,
+    'love': 2,
+    'surprise': 1
+}
+
 class SpecialClassifier(Classifier):
     TYPE = 'special'
 
@@ -10,18 +19,23 @@ class SpecialClassifier(Classifier):
         keys = sorted(self.classifiers.keys())
         results = [1] * len(keys)
 
-        mixed = -0.5
+        mixed = [ 0.00001, 0.00001, 0.00001 ]
         for (key_index, layer) in enumerate(keys):
             result = self.classifiers[layer].prob_classify(features)
-            results[key_index] = result.prob(layer)
+            layer_prob = result.prob(layer)
 
-            if (result.prob(layer) > 0.5):
-                mixed += result.prob(layer)
+            results[key_index] = layer_prob
+
+            if (layer_prob > 0.5):
+                cardinal = EMOTION_CARDINALS[layer]
+                if (layer_prob / 2) > mixed[cardinal]:
+                    mixed[cardinal] = layer_prob / 2
+
 
         results.append(0.5)
         keys.append('neutral')
 
-        results.append(mixed)
+        results.append(sum(mixed))
         keys.append('mixed')
 
         for (index, value) in enumerate(results):

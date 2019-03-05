@@ -54,7 +54,7 @@ class AnalysisService(SearchService):
             
             if ('perspective' in fields):
                 parsed = self.nlp(result['text'])
-                curation['perspective'] = self.get_perspective(parsed.print_tree(), 1, [])
+                curation['perspective'] = self.get_perspective(parsed.print_tree(), [])
 
 
             if ('sentiment' in fields):
@@ -97,31 +97,42 @@ class AnalysisService(SearchService):
         }
 
     
-    def get_perspective(self, tree, level, subjects):
-        ignore = [
-            'which',
-            'that',
-            'it',
-            'they',
-            'he',
-            'one',
-            'who',
-            'she'
-        ]
-
+    def get_perspective(self, tree, subjects = [], allow_modifiers = False, allow_preps = False):
         for item in tree:
-            if len(item['modifiers']) > 0:
-                subject = self.get_perspective(item['modifiers'], level + 1, subjects)
+            if allow_preps == False and item['arc'] == 'prep':
+                continue
 
-            if item['arc'] == 'nsubj':
-                if item['word'].lower() not in ignore:
-                    subjects.append([item['word'], level])
+            elif item['arc'] == 'nsubj' or item['arc'] == 'dobj' or item['arc'] == 'pobj':
+                if item['NE'] != '' and item['NE'] != 'DATE':
+                    subjects.append(item['word'])
 
-        if (len(subjects)):
-            reordered = sorted(subjects, key=lambda subject: subject[1], reverse=True)
-            return reordered[0][0]
+                    if len(item['modifiers']) > 0:
+                        subjects = self.get_perspective(item['modifiers'], subjects, True, allow_preps)
 
-        return None
+                elif len(item['modifiers']) > 0:
+                    subjects = self.get_perspective(item['modifiers'], subjects, True, allow_preps)
+
+
+            elif allow_modifiers == True and item['arc'] == 'conj' or item['arc'] == 'appos':
+                if item['NE'] != '' and item['NE'] != 'DATE':
+                    subjects.append(item['word'])
+
+                    if len(item['modifiers']) > 0:
+                        subjects = self.get_perspective(item['modifiers'], subjects, True, allow_preps)
+                
+                    elif len(item['modifiers']) > 0:
+                        subjects = self.get_perspective(item['modifiers'], subjects, True, allow_preps)
+
+
+            elif len(item['modifiers']) > 0:
+                subjects = self.get_perspective(item['modifiers'], subjects, False, allow_preps)
+
+        
+        if len(subjects) == 0 and allow_preps == False:
+            subjects = self.get_perspective(tree, subjects, False, True)
+
+
+        return subjects
 
 
     def handle(self, query, type):
