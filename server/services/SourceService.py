@@ -1,9 +1,3 @@
-import requests
-import nltk
-import json
-import urllib.parse
-
-from server.core.Classifier import Classifier
 from server.services.SearchService import SearchService
 from newspaper import Article
 
@@ -13,12 +7,6 @@ IGNORE = [
 ]
 
 class SourceService(SearchService):
-    def __init__(self):
-        # self.classifier = Classifier()
-
-        super().__init__()
-
-    
     def handle(self, query, type):
         if query['meta']['type'] == 'search.news':
             response = self.news(query)
