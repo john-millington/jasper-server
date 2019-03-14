@@ -1,12 +1,14 @@
 import requests
 
-from core.data.RDSConnect import RDSConnect
+from byron.storage import RDSConnect
 from server.RequestType import RequestType
 from server.core.EntityBuilder import EntityBuilder
 
 WIKI_SEARCH_ENDPOINT = 'https://www.wikidata.org/w/api.php?action=wbsearchentities&search={}&language=en&format=json&limit=10'
 
 class EntityService(RDSConnect):
+  DATABASE = 'dev'
+  
   def __init__(self):
     super().__init__()
     self.instance.autocommit(True)

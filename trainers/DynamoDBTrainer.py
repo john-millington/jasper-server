@@ -1,11 +1,11 @@
 import math
 import random
 
-from trainers.DynamoDBResource import DynamoDBResource
+from byron.storage.DynamoDBConnect import DynamoDBConnect
 from corpus.SentimentFeatures import SentimentFeatures
 from trainers.MultilayeredRecursiveRegression import MultilayeredRecursiveRegression
 
-class DynamoDBTrainer(DynamoDBResource):
+class DynamoDBTrainer(DynamoDBConnect):
     def __init__(self, resource, trim = True, features = SentimentFeatures(), test_ratio = 0.3):
         self.trim = trim
         self.features = features

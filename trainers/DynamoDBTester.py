@@ -1,9 +1,9 @@
 import time
 
-from trainers.DynamoDBResource import DynamoDBResource
+from byron.storage.DynamoDBConnect import DynamoDBConnect
 from corpus.SentimentFeatures import SentimentFeatures
 
-class DynamoDBTester(DynamoDBResource):
+class DynamoDBTester(DynamoDBConnect):
     def __init__(self, classifier, resource, features = SentimentFeatures(), output = None):
         self.classifier = classifier
         self.features = features
