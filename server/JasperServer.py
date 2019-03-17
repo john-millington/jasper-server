@@ -7,7 +7,6 @@ from urllib.parse import parse_qs
 from server.RequestType import RequestType
 
 from server.services.AnalysisService import AnalysisService
-from server.services.ClassifyService import ClassifyService
 from server.services.EntityService import EntityService
 from server.services.FeedbackService import FeedbackService
 from server.services.SearchService import SearchService
@@ -18,7 +17,6 @@ class JasperServer(BaseHTTPRequestHandler):
 
     SERVICES = {
         '/api/analyse': AnalysisService(),
-        '/api/classify': ClassifyService(),
         '/api/entities': EntityService(),
         '/api/feedback': FeedbackService(),
         '/api/search': SearchService(),

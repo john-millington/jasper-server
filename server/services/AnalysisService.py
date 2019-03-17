@@ -1,4 +1,3 @@
-import boto3
 import random
 import spacy
 
@@ -43,10 +42,6 @@ class AnalysisService(SearchService):
             }
 
 
-            if ('language' in fields):
-                curation['language'] = self.classifier.language(text)
-
-
             if ('phrases' in fields):
                 phrases = KeyPhrase2.extract(text)
                 curation['phrases'] = phrases
@@ -84,10 +79,6 @@ class AnalysisService(SearchService):
                     'confidence': confidence
                 }
 
-
-            if ('structure' in fields):
-                structure = self.classifier.structure(text)
-                curation['structure'] = structure
 
             curated.append(curation)
 
@@ -146,66 +137,12 @@ class AnalysisService(SearchService):
                 count = int(query['topics'][0])
                 response['topics'] = KeyPhrase2.topics(response['results'], count)
 
-            # self.store(response, fields)
             return response
         
+
         return {
             'error': {
                 'message': 'missing parameters',
                 'code': 'JS_ERR_1000'
             }
         }
-
-    
-    def store(self, response, fields):
-        dynamodb = boto3.resource('dynamodb')
-
-        if ('emotion' in fields):
-            emotion = dynamodb.Table('emotion')
-            emotion_put = []
-
-            with emotion.batch_writer() as batch:
-                for result in response['results']:
-                    if result['text'] in emotion_put:
-                        continue
-
-                    confidence = int(round(result['emotion']['confidence'], 2) * 100)
-                    if confidence < 75:
-                        continue
-
-                    emotion_put.append(result['text'])
-
-                    emotion_flag = result['emotion']['emotion']
-                    score = int(round(result['emotion']['scores'][emotion_flag], 2) * 100)
-
-                    batch.put_item(Item={
-                        'text': result['text'],
-                        'emotion': emotion_flag,
-                        'score': score,
-                        'confidence': confidence
-                    })
-
-        if ('sentiment' in fields):
-            sentiment = dynamodb.Table('sentiment')
-            sentiment_put = []
-
-            with sentiment.batch_writer() as batch:
-                for result in response['results']:
-                    if result['text'] in sentiment_put:
-                        continue
-
-                    confidence = int(round(result['sentiment']['confidence'], 2) * 100)
-                    if confidence < 70:
-                        continue
-
-                    sentiment_put.append(result['text'])
-
-                    sentiment_flag = result['sentiment']['sentiment']
-                    score = int(round(result['sentiment']['scores'][sentiment_flag], 2) * 100)
-
-                    batch.put_item(Item={
-                        'text': result['text'],
-                        'sentiment': sentiment_flag,
-                        'score': score,
-                        'confidence': confidence
-                    })

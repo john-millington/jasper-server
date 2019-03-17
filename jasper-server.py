@@ -12,7 +12,7 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
 '''
-This sets the listening port, default port 8080
+This sets the listening port, default port 1000
 '''
 if sys.argv[1:]:
     PORT = int(sys.argv[1])
