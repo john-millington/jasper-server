@@ -1,8 +1,6 @@
 import random
 import spacy
 
-from corpus.KeyPhrase import KeyPhrase
-from corpus.KeyPhrase2 import KeyPhrase2
 from server.core.Classifier import Classifier
 from server.services.SearchService import SearchService
 
@@ -40,11 +38,6 @@ class AnalysisService(SearchService):
                     **meta
                 }
             }
-
-
-            if ('phrases' in fields):
-                phrases = KeyPhrase2.extract(text)
-                curation['phrases'] = phrases
 
             
             if ('perspective' in fields):
@@ -133,10 +126,6 @@ class AnalysisService(SearchService):
                 fields = query['fields'][0].split(',')
 
             response = self.analyse(query, fields)
-            if ('topics' in query):
-                count = int(query['topics'][0])
-                response['topics'] = KeyPhrase2.topics(response['results'], count)
-
             return response
         
 
