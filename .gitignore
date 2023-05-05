@@ -6,3 +6,4 @@ trainers/trained/archived/*
 
 *.pyc
 *.DS_Store
+.env
