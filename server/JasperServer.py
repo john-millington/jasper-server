@@ -10,7 +10,7 @@ from server.RequestType import RequestType
 from server.services.EntityService import EntityService
 from server.services.FeedbackService import FeedbackService
 # from server.services.SearchService import SearchService
-from server.services.SourceService import SourceService
+# from server.services.SourceService import SourceService
 
 class JasperServer(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
@@ -20,7 +20,7 @@ class JasperServer(BaseHTTPRequestHandler):
         '/api/entities': EntityService(),
         '/api/feedback': FeedbackService(),
         # '/api/search': SearchService(),
-        '/api/source': SourceService()
+        # '/api/source': SourceService()
     }
 
     def do_GET(self):
@@ -44,15 +44,15 @@ class JasperServer(BaseHTTPRequestHandler):
         
         service = parsed_params.path
         if (service in JasperServer.SERVICES):
-            # try:
+            try:
                 response = JasperServer.SERVICES[service].handle(request_body, request_type)
-            # except:
-            #     response = {
-            #         'error': {
-            #             'message': 'internal service error',
-            #             'code': 'JS_ERR_5000'
-            #         }
-            #     }
+            except:
+                response = {
+                    'error': {
+                        'message': 'internal service error',
+                        'code': 'JS_ERR_5000'
+                    }
+                }
         else:
             response = {
                 'error': {
